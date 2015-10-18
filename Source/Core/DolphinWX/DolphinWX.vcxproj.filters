@@ -31,6 +31,9 @@
     <Filter Include="GUI\ISOProperties">
       <UniqueIdentifier>{d72aa7f0-ed24-4fed-9d3a-38b82d1b753c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="GUI\Tuner">
+      <UniqueIdentifier>{1d087454-ae48-4d1f-8803-8b3242394101}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp" />
@@ -262,6 +265,9 @@
     <ClCompile Include="DolphinSlider.cpp">
       <Filter>GUI\Widgets</Filter>
     </ClCompile>
+    <ClCompile Include="Tuner\TWWTunerInput.cpp">
+      <Filter>GUI\Tuner</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h" />
@@ -485,6 +491,9 @@
     </ClInclude>
     <ClInclude Include="DolphinSlider.h">
       <Filter>GUI\Widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="Tuner\TWWTunerInput.h">
+      <Filter>GUI\Tuner</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

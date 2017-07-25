@@ -323,6 +323,9 @@ void TASInputDlg::CreateGCLayout()
 	m_buttons[15] = &m_quickspin;
 	m_buttons[16] = &m_rollassist;
 	m_buttons[17] = &m_skipDialog;
+	m_buttons[18] = &m_auto_analog;
+	m_buttons[19] = &m_analog_up;
+	m_buttons[20] = &m_analog_down;
 
 	m_controls[2] = &m_c_stick.x_cont;
 	m_controls[3] = &m_c_stick.y_cont;
@@ -373,17 +376,21 @@ void TASInputDlg::CreateGCLayout()
 	wxStaticBoxSizer* const m_buttons_extra = new wxStaticBoxSizer(wxVERTICAL, this, _("Extras"));
 	wxGridSizer* const m_buttons_grid_extra = new wxGridSizer(1);
 
+	m_auto_analog = CreateButton("Auto Analog");
 	m_reset = CreateButton("Reset");
 	m_quickspin = CreateButton("Quick Spin");
 	m_rollassist = CreateButton("Auto Roll");
 	m_skipDialog = CreateButton("Auto Dialog");
+	m_analog_up = CreateButton("Analog Up");
+	m_analog_down = CreateButton("Analog Down");
+
 
 	m_rollassist.checkbox->Bind(wxEVT_CHECKBOX, &TASInputDlg::UpdateFromButtons, this);
 
-	for (unsigned int i = 14; i < 18; ++i)
+	for (unsigned int i = 14; i < 21; ++i)
 		if (m_buttons[i] != nullptr)
 			m_buttons_grid_extra->Add(m_buttons[i]->checkbox, false);
-	m_buttons_grid_extra->AddSpacer(5);
+	m_buttons_grid_extra->AddSpacer(6);
 
 	m_buttons_extra->Add(m_buttons_grid_extra);
 
@@ -397,7 +404,6 @@ void TASInputDlg::CreateGCLayout()
 
 	//Dragonbane
 	bottom_box->Add(m_buttons_extra, 0, wxLEFT | wxRIGHT | wxBOTTOM, 5);
-
 	
 	main_szr->Add(top_box);
 	main_szr->Add(bottom_box);
@@ -1275,6 +1281,35 @@ void TASInputDlg::ExecuteHelpers()
 		ProcessorInterface::ResetButton_Tap();
 	}
 
+	//Auto Analog
+	if (m_auto_analog.checkbox->IsChecked())
+	{
+		if (!auto_analog)
+		{
+			analog_x_timer = Movie::g_currentFrame;
+			auto_analog = true;
+		}
+
+		if (analog_x_timer + 2 == Movie::g_currentFrame)
+		{
+			analog_x_timer = Movie::g_currentFrame;
+		}
+
+		if (analog_x_timer + 1 == Movie::g_currentFrame)
+		{
+			m_main_stick.x_cont.text->SetValue(std::to_string(255));
+		}
+
+		if (analog_x_timer == Movie::g_currentFrame)
+		{
+			m_main_stick.x_cont.text->SetValue(std::to_string(1));
+		}
+	}
+	else
+	{
+		auto_analog = false;
+	}
+
 	//Auto Dialog
 	if (m_skipDialog.checkbox->IsChecked())
 	{
@@ -1305,6 +1340,29 @@ void TASInputDlg::ExecuteHelpers()
 	{
 		auto_dialog = false;
 	}
+
+	//Analog Up
+	if (m_analog_up.checkbox->IsChecked())
+	{
+		analog_stick_up = true;
+		m_main_stick.y_cont.text->SetValue(std::to_string(255)); //Up
+	}
+	else
+	{
+		analog_stick_up = false;
+	}
+
+	//Analog Down
+	if (m_analog_down.checkbox->IsChecked())
+	{
+		analog_stick_down = true;
+		m_main_stick.y_cont.text->SetValue(std::to_string(1)); //Down
+	}
+	else
+	{
+		analog_stick_down = false;
+	}
+
 
 	//Quickspin
 	if (m_quickspin.checkbox->IsChecked())

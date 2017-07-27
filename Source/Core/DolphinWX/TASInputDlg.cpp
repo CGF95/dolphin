@@ -233,8 +233,8 @@ wxBoxSizer* TASInputDlg::CreateCCLayout()
 	m_cc_controls[CC_L_TRIGGER] = &m_cc_l;
 	m_cc_controls[CC_R_TRIGGER] = &m_cc_r;
 
-	m_cc_l_stick_szr = CreateStickLayout(&m_cc_l_stick, _("Left stick"));
-	m_cc_r_stick_szr = CreateStickLayout(&m_cc_r_stick, _("Right stick"));
+	m_cc_l_stick_szr = CreateStickLayout(&m_cc_l_stick, _("Left Stick"));
+	m_cc_r_stick_szr = CreateStickLayout(&m_cc_r_stick, _("Right Stick"));
 
 	m_cc_l = CreateControl(wxSL_VERTICAL, -1, 100, false, 31, 0);;
 	m_cc_r = CreateControl(wxSL_VERTICAL, -1, 100, false, 31, 0);;
@@ -323,9 +323,10 @@ void TASInputDlg::CreateGCLayout()
 	m_buttons[15] = &m_quickspin;
 	m_buttons[16] = &m_rollassist;
 	m_buttons[17] = &m_skipDialog;
-	m_buttons[18] = &m_auto_analog;
-	m_buttons[19] = &m_analog_up;
-	m_buttons[20] = &m_analog_down;
+	m_buttons[18] = &m_analog_up;
+	m_buttons[19] = &m_analog_down;
+	m_buttons[20] = &m_analog_left;
+	m_buttons[21] = &m_analog_right;
 
 	m_controls[2] = &m_c_stick.x_cont;
 	m_controls[3] = &m_c_stick.y_cont;
@@ -376,18 +377,19 @@ void TASInputDlg::CreateGCLayout()
 	wxStaticBoxSizer* const m_buttons_extra = new wxStaticBoxSizer(wxVERTICAL, this, _("Extras"));
 	wxGridSizer* const m_buttons_grid_extra = new wxGridSizer(1);
 
-	m_auto_analog = CreateButton("Auto Analog");
 	m_reset = CreateButton("Reset");
 	m_quickspin = CreateButton("Quick Spin");
 	m_rollassist = CreateButton("Auto Roll");
 	m_skipDialog = CreateButton("Auto Dialog");
 	m_analog_up = CreateButton("Analog Up");
 	m_analog_down = CreateButton("Analog Down");
+	m_analog_left = CreateButton("Analog Left");
+	m_analog_right = CreateButton("Analog Right");
 
 
 	m_rollassist.checkbox->Bind(wxEVT_CHECKBOX, &TASInputDlg::UpdateFromButtons, this);
 
-	for (unsigned int i = 14; i < 21; ++i)
+	for (unsigned int i = 14; i < 22; ++i)
 		if (m_buttons[i] != nullptr)
 			m_buttons_grid_extra->Add(m_buttons[i]->checkbox, false);
 	m_buttons_grid_extra->AddSpacer(6);
@@ -1281,66 +1283,6 @@ void TASInputDlg::ExecuteHelpers()
 		ProcessorInterface::ResetButton_Tap();
 	}
 
-	//Auto Analog
-	if (m_auto_analog.checkbox->IsChecked())
-	{
-		if (!auto_analog)
-		{
-			analog_x_timer = Movie::g_currentFrame;
-			auto_analog = true;
-		}
-
-		if (analog_x_timer + 2 == Movie::g_currentFrame)
-		{
-			analog_x_timer = Movie::g_currentFrame;
-		}
-
-		if (analog_x_timer + 1 == Movie::g_currentFrame)
-		{
-			m_main_stick.x_cont.text->SetValue(std::to_string(255));
-		}
-
-		if (analog_x_timer == Movie::g_currentFrame)
-		{
-			m_main_stick.x_cont.text->SetValue(std::to_string(1));
-		}
-	}
-	else
-	{
-		auto_analog = false;
-	}
-
-	//Auto Dialog
-	if (m_skipDialog.checkbox->IsChecked())
-	{
-		if (!auto_dialog)
-		{
-			dialog_timer = Movie::g_currentFrame;
-			auto_dialog = true;
-		}
-
-		if (dialog_timer + 2 == Movie::g_currentFrame)
-		{
-			dialog_timer = Movie::g_currentFrame;
-		}
-
-		if (dialog_timer + 1 == Movie::g_currentFrame)
-		{
-			m_b.checkbox->SetValue(false);
-			m_a.checkbox->SetValue(true);
-		}
-
-		if (dialog_timer == Movie::g_currentFrame)
-		{
-			m_b.checkbox->SetValue(true);
-			m_a.checkbox->SetValue(false);
-		}
-	}
-	else
-	{
-		auto_dialog = false;
-	}
-
 	//Analog Up
 	if (m_analog_up.checkbox->IsChecked())
 	{
@@ -1363,6 +1305,27 @@ void TASInputDlg::ExecuteHelpers()
 		analog_stick_down = false;
 	}
 
+	//Analog Left
+	if (m_analog_left.checkbox->IsChecked())
+	{
+		analog_stick_left = true;
+		m_main_stick.x_cont.text->SetValue(std::to_string(1));
+	}
+	else
+	{
+		analog_stick_left = false;
+	}
+
+	//Analog Right
+	if (m_analog_right.checkbox->IsChecked())
+	{
+		analog_stick_right = true;
+		m_main_stick.x_cont.text->SetValue(std::to_string(255));
+	}
+	else
+	{
+		analog_stick_right = false;
+	}
 
 	//Quickspin
 	if (m_quickspin.checkbox->IsChecked())

@@ -125,11 +125,11 @@ private:
 
 	//Dragonbane, analog stuff by CGF
 
-	Button m_reset, m_quickspin, m_rollassist, m_skipDialog, m_analog_left, m_analog_right, m_auto_analog, m_analog_up, m_analog_down;
+	Button m_reset, m_quickspin, m_rollassist, m_skipDialog, m_analog_up, m_analog_down, m_analog_left, m_analog_right;
 
 	Stick m_cc_l_stick, m_cc_r_stick;
 
-	Button* m_buttons[21]; //Original: 13, DB: 18
+	Button* m_buttons[24]; //Original: 13, DB: 18
 	Button m_cc_buttons[15];
 	Control* m_controls[10];
 	Control* m_cc_controls[6];
@@ -155,14 +155,14 @@ private:
 
 	bool auto_dialog = false;
 	int dialog_timer = 0;
-	
-	bool auto_analog = false;
-	int analog_x_timer = 0;
 
 	bool analog_stick_up = false;
-	int analog_y_timer = 0;
 
 	bool analog_stick_down = false;
+
+	bool analog_stick_left = false;
+
+	bool analog_stick_right = false;
 
 	wxGridSizer* m_buttons_dpad;
 };

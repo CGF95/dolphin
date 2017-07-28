@@ -171,7 +171,7 @@ void TASInputDlg::CreateWiiLayout(int num)
 	m_controls[9] = &m_nz_cont;
 
 	m_c_stick = CreateStick(ID_C_STICK, 255, 255, 128, 128, false, true);
-	m_c_stick_szr = CreateStickLayout(&m_c_stick, _("Nunchuk stick"));
+	m_c_stick_szr = CreateStickLayout(&m_c_stick, _("Nunchuk Stick"));
 
 	m_nx_cont = CreateControl(wxSL_VERTICAL, -1, 100, false, 1023, 512);
 	m_ny_cont = CreateControl(wxSL_VERTICAL, -1, 100, false, 1023, 512);
@@ -392,7 +392,7 @@ void TASInputDlg::CreateGCLayout()
 	for (unsigned int i = 14; i < 22; ++i)
 		if (m_buttons[i] != nullptr)
 			m_buttons_grid_extra->Add(m_buttons[i]->checkbox, false);
-	m_buttons_grid_extra->AddSpacer(6);
+	m_buttons_grid_extra->AddSpacer(5);
 
 	m_buttons_extra->Add(m_buttons_grid_extra);
 
@@ -1326,6 +1326,38 @@ void TASInputDlg::ExecuteHelpers()
 	{
 		analog_stick_right = false;
 	}
+
+	//Auto Dialog
+	if (m_skipDialog.checkbox->IsChecked())
+	{
+		if (!auto_dialog)
+		{
+			dialog_timer = Movie::g_currentFrame;
+			auto_dialog = true;
+		}
+
+		if (dialog_timer + 2 == Movie::g_currentFrame)
+		{
+			dialog_timer = Movie::g_currentFrame;
+		}
+
+		if (dialog_timer + 1 == Movie::g_currentFrame)
+		{
+			m_b.checkbox->SetValue(false);
+			m_a.checkbox->SetValue(true);
+		}
+
+		if (dialog_timer == Movie::g_currentFrame)
+		{
+			m_b.checkbox->SetValue(true);
+			m_a.checkbox->SetValue(false);
+		}
+	}
+	else
+	{
+		auto_dialog = false;
+	}
+
 
 	//Quickspin
 	if (m_quickspin.checkbox->IsChecked())

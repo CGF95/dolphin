@@ -253,6 +253,7 @@ EVT_MENU_RANGE(IDM_FLOAT_LOG_WINDOW, IDM_FLOAT_CODE_WINDOW, CFrame::OnFloatWindo
 // Game list context menu
 EVT_MENU(IDM_LIST_PERFORM_DISC_UPDATE, CFrame::OnPerformDiscWiiUpdate)
 EVT_MENU(IDM_LIST_INSTALL_WAD, CFrame::OnInstallWAD)
+EVT_MENU(IDM_TUNER_INPUT, CFrame::OnTWWTunerInput) //Dragonbane
 EVT_MENU(IDM_LIST_UNINSTALL_WAD, CFrame::OnUninstallWAD)
 
 // Other
@@ -343,6 +344,9 @@ CFrame::CFrame(wxFrame* parent, wxWindowID id, const wxString& title, wxRect geo
   }
 
   wxFrame::CreateToolBar(wxTB_DEFAULT_STYLE | wxTB_TEXT | wxTB_FLAT)->Realize();
+
+  // Dragonbane / CGF95
+  m_TWWTunerInput_dialog = new TWWTunerInput(this);
 
   // Give it a status bar
   SetStatusBar(

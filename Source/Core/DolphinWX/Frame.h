@@ -22,6 +22,7 @@
 #include "Common/Event.h"
 #include "Core/ConfigManager.h"
 #include "DolphinWX/Globals.h"
+#include "DolphinWX/Tuner/TWWTunerInput.h"
 
 #if defined(HAVE_X11) && HAVE_X11
 #include "UICommon/X11Utils.h"
@@ -144,6 +145,7 @@ private:
   };
 
   static constexpr int MOUSE_HIDE_DELAY = 3000;
+  TWWTunerInput* m_TWWTunerInput_dialog;
   GameListCtrl* m_game_list_ctrl = nullptr;
   CConfigMain* m_main_config_dialog = nullptr;
   wxPanel* m_panel = nullptr;
@@ -240,6 +242,7 @@ private:
   WXLRESULT MSWWindowProc(WXUINT nMsg, WXWPARAM wParam, WXLPARAM lParam);
 #endif
 
+
   // Screensaver
   void EnableScreenSaver(bool enable);
   void DoOpen(bool Boot);
@@ -280,6 +283,7 @@ private:
   void OnRecordExport(wxCommandEvent& event);
   void OnRecordReadOnly(wxCommandEvent& event);
   void OnTASInput(wxCommandEvent& event);
+  void OnTWWTunerInput(wxCommandEvent& event);
   void OnTogglePauseMovie(wxCommandEvent& event);
   void OnToggleDumpFrames(wxCommandEvent& event);
   void OnToggleDumpAudio(wxCommandEvent& event);

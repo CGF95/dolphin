@@ -88,6 +88,7 @@
 #include "DolphinWX/TASInputDlg.h"
 #include "DolphinWX/WxEventUtils.h"
 #include "DolphinWX/WxUtils.h"
+#include "DolphinWX/Tuner/TWWTunerInput.h"
 
 #include "InputCommon/ControllerInterface/ControllerInterface.h"
 
@@ -176,6 +177,7 @@ void CFrame::BindMenuBarEvents()
   Bind(wxEVT_MENU, &CFrame::OnConfigHotkey, this, IDM_CONFIG_HOTKEYS);
 
   // Tools menu
+  Bind(wxEVT_MENU, &CFrame::OnTWWTunerInput, this, IDM_TUNER_INPUT);
   Bind(wxEVT_MENU, &CFrame::OnMemcard, this, IDM_MEMCARD);
   Bind(wxEVT_MENU, &CFrame::OnImportSave, this, IDM_IMPORT_SAVE);
   Bind(wxEVT_MENU, &CFrame::OnExportAllSaves, this, IDM_EXPORT_ALL_SAVE);
@@ -1185,6 +1187,11 @@ void CFrame::OnMemcard(wxCommandEvent& WXUNUSED(event))
   HotkeyManagerEmu::Enable(false);
   MemcardManager.ShowModal();
   HotkeyManagerEmu::Enable(true);
+}
+
+void CFrame::OnTWWTunerInput(wxCommandEvent& WXUNUSED(event))
+{
+	m_TWWTunerInput_dialog->Show(true);
 }
 
 void CFrame::OnLoadGameCubeIPLJAP(wxCommandEvent&)

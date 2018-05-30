@@ -19,6 +19,7 @@
 #include "DolphinWX/Frame.h"
 #include "DolphinWX/Globals.h"
 #include "DolphinWX/WxUtils.h"
+#include "DolphinWX/Tuner/TWWTunerInput.h"
 
 wxDEFINE_EVENT(EVT_POPULATE_PERSPECTIVES_MENU, MainMenuBar::PopulatePerspectivesEvent);
 
@@ -218,6 +219,8 @@ wxMenu* MainMenuBar::CreateToolsMenu() const
   wiimote_menu->AppendCheckItem(IDM_CONNECT_BALANCEBOARD, _("Connect Balance Board"));
 
   auto* const tools_menu = new wxMenu;
+  tools_menu->Append(IDM_TUNER_INPUT, _("Tingle Tuner Input"));
+  tools_menu->AppendSeparator();
   tools_menu->Append(IDM_MEMCARD, _("&Memory Card Manager (GC)"));
   tools_menu->Append(IDM_IMPORT_SAVE, _("Import Wii Save..."));
   tools_menu->Append(IDM_EXPORT_ALL_SAVE, _("Export All Wii Saves"));

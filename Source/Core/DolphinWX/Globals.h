@@ -90,6 +90,7 @@ enum
   IDM_DRIVE24 = IDM_DRIVE1 + 23,  // 248,
 
   // Tools menu
+  IDM_TUNER_INPUT,
   IDM_MEMCARD,
   IDM_CHEATS,
   IDM_NETPLAY,

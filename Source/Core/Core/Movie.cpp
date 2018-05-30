@@ -58,6 +58,8 @@
 #include "VideoCommon/VideoBackendBase.h"
 #include "VideoCommon/VideoConfig.h"
 
+#include "Core/Host.h"
+
 // The chunk to allocate movie data in multiples of.
 #define DTM_BASE_LENGTH (1024)
 
@@ -66,6 +68,13 @@ namespace Movie
 static bool s_bReadOnly = true;
 static u32 s_rerecords = 0;
 static PlayMode s_playMode = MODE_NONE;
+
+// Dragonbane: Tuner Stuff
+u8 tunerActionID = 0;
+u8 tunerExecuteID = 0;
+u8 tunerStatus = 0; //Disabled by default
+static u8 s_numGBAs; //Dragonbane
+
 
 static u8 s_controllers = 0;
 static ControllerState s_padState;
@@ -381,6 +390,11 @@ bool IsUsingBongo(int controller)
 {
   return ((s_bongos & (1 << controller)) != 0);
 }
+//Dragonbane
+bool IsUsingGBA(int controller)
+{
+  return ((s_numGBAs & (1 << controller)) != 0);
+}
 
 bool IsUsingWiimote(int wiimote)
 {
@@ -479,12 +493,15 @@ bool BeginRecordingInput(int controllers)
     return false;
 
   Core::RunAsCPUThread([controllers] {
+    tunerActionID = 0; //DB
+    tunerExecuteID = 0; //Dragonbane
     s_controllers = controllers;
     s_currentFrame = s_totalFrames = 0;
     s_currentLagCount = s_totalLagCount = 0;
     s_currentInputCount = s_totalInputCount = 0;
     s_totalTickCount = s_tickCountAtLastInput = 0;
     s_bongos = 0;
+    s_numGBAs = 0;
     s_memcards = 0;
     if (NetPlay::IsNetPlayRunning())
     {
@@ -506,6 +523,8 @@ bool BeginRecordingInput(int controllers)
     {
       if (SConfig::GetInstance().m_SIDevice[i] == SerialInterface::SIDEVICE_GC_TARUKONGA)
         s_bongos |= (1 << i);
+      else if (SConfig::GetInstance().m_SIDevice[i] == SerialInterface::SIDEVICE_GC_GBA) //Dragonbane
+        s_numGBAs |= (1 << i);
     }
 
     if (Core::IsRunningAndStarted())
@@ -794,6 +813,14 @@ void CheckPadStatus(GCPadStatus* PadStatus, int controllerID)
   s_padState.reset = s_bReset;
   s_bReset = false;
 
+  //Dragonbane: Record Tuner Events
+  s_padState.tunerEvent = tunerActionID;
+
+  if (tunerActionID > 0)
+    tunerExecuteID = tunerActionID;
+
+  tunerActionID = 0;
+
   SetInputDisplayString(s_padState, controllerID);
 }
 
@@ -922,6 +949,10 @@ void DoState(PointerWrap& p)
   p.Do(s_currentInputCount);
   p.Do(s_bPolled);
   p.Do(s_tickCountAtLastInput);
+  p.Do(tunerExecuteID); //Save current Tuner Action ID
+  p.Do(tunerStatus); //Save Tuner Status for Display
+
+
   // other variables (such as s_totalBytes and s_totalFrames) are set in LoadInput
 }
 
@@ -1195,6 +1226,12 @@ void PlayController(GCPadStatus* PadStatus, int controllerID)
 
   if (s_padState.reset)
     ProcessorInterface::ResetButton_Tap();
+
+  //Dragonbane: Execute Tuner Events
+  if (s_padState.tunerEvent > 0)
+  {
+    tunerExecuteID = s_padState.tunerEvent;
+  }
 
   SetInputDisplayString(s_padState, controllerID);
   CheckInputEnd();

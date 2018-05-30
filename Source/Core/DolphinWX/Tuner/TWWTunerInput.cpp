@@ -23,7 +23,7 @@
 #include <wx/utils.h>
 
 #include "Common/Common.h"
-#include "TWWTunerInput.h"
+#include "DolphinWX/Tuner/TWWTunerInput.h"
 #include "Core/Core.h"
 #include "Core/HW/Memmap.h"
 #include "Common/IniFile.h"

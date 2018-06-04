@@ -916,6 +916,8 @@ bool PlayInput(const std::string& movie_path, std::optional<std::string>* savest
 
   s_playMode = MODE_PLAYING;
 
+  tunerActionID = 0;
+  tunerExecuteID = 0;
   // Wiimotes cause desync issues if they're not reset before launching the game
   Wiimote::ResetAllWiimotes();
 
@@ -949,9 +951,13 @@ void DoState(PointerWrap& p)
   p.Do(s_currentInputCount);
   p.Do(s_bPolled);
   p.Do(s_tickCountAtLastInput);
-  p.Do(tunerExecuteID); //Save current Tuner Action ID
-  p.Do(tunerStatus); //Save Tuner Status for Display
 
+  if (!p.GetMode() == PointerWrap::MODE_READ)
+  {
+    //Dragonbane: Tuner Stuff
+    p.Do(tunerExecuteID); //Save current Tuner Action ID
+    p.Do(tunerStatus); //Save Tuner Status for Display
+  }
 
   // other variables (such as s_totalBytes and s_totalFrames) are set in LoadInput
 }
@@ -1359,6 +1365,7 @@ void SaveRecording(const std::string& filename)
   header.DSPiromHash = s_DSPiromHash;
   header.DSPcoefHash = s_DSPcoefHash;
   header.tickCount = s_totalTickCount;
+  header.numGBAs = s_numGBAs; //Dragonbane
 
   // TODO
   header.uniqueID = 0;

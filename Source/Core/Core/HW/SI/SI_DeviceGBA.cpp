@@ -25,20 +25,20 @@
 #include "Core/HW/SI/SI_Device.h"
 #include "Core/HW/SI/SI_DeviceGBA.h"
 #include "Core/HW/SystemTimers.h"
-//Dragonbane
-#include "Core/Movie.h"
-#include "Core/HW/Memmap.h"
+#include "Core/Movie.h" //Dragonbane
+#include "Core/State.h" //Dragonbane
+#include "Core/HW/Memmap.h" //Dragonbane
 
-std::thread s_connection_thread;
-std::queue<std::unique_ptr<sf::TcpSocket>> s_waiting_socks;
-std::queue<std::unique_ptr<sf::TcpSocket>> s_waiting_clocks;
-std::mutex s_cs_gba;
-std::mutex s_cs_gba_clk;
-int num_connected;
-Common::Flag s_server_running;
 
 namespace SerialInterface
 {
+  static std::thread s_connection_thread;
+  static std::queue<std::unique_ptr<sf::TcpSocket>> s_waiting_socks;
+  static std::queue<std::unique_ptr<sf::TcpSocket>> s_waiting_clocks;
+  static std::mutex s_cs_gba;
+  static std::mutex s_cs_gba_clk;
+  static u8 num_connected;
+  namespace { Common::Flag s_server_running; }
 
 enum EJoybusCmds
 {
@@ -50,7 +50,7 @@ enum EJoybusCmds
 
 //Dragonbane: Custom Tuner Stuff
 //LOG FILE
-//static File::IOFile outputFile("C:\\DolphinExport\\GBA.log", "wb");
+static File::IOFile outputFile("E:\\DolphinExport\\GBA.log", "wb");
 static u64 frameTarget = 0;
 
 //Connection variables
@@ -104,7 +104,7 @@ u8 GetNumConnected()
 	return num_ports_connected;
 }
 
-static int GetTransferTime(u8 cmd)
+int GetTransferTime(u8 cmd)
 {
   u64 bytes_transferred = 0;
 
@@ -132,8 +132,7 @@ static int GetTransferTime(u8 cmd)
     break;
   }
   }
-  return static_cast<int>(bytes_transferred * SystemTimers::GetTicksPerSecond() /
-                          (std::max(num_connected, 1) * BYTES_PER_SECOND));
+  return (int)(bytes_transferred * SystemTimers::GetTicksPerSecond() / (GetNumConnected() * BYTES_PER_SECOND));
 }
 
 static void GBAConnectionWaiter()
@@ -178,22 +177,6 @@ static void GBAConnectionWaiter()
   }
 }
 
-static bool GetAvailableSock(std::unique_ptr<sf::TcpSocket>& sock_to_fill)
-{
-	bool sock_filled = false;
-
-	std::lock_guard<std::mutex> lk(s_cs_gba);
-
-	if (!s_waiting_socks.empty())
-	{
-		sock_to_fill = std::move(s_waiting_socks.front());
-		s_waiting_socks.pop();
-		sock_filled = true;
-	}
-
-	return sock_filled;
-}
-
 void GBAConnectionWaiter_Shutdown()
 {
   s_server_running.Clear();
@@ -201,26 +184,36 @@ void GBAConnectionWaiter_Shutdown()
     s_connection_thread.join();
 }
 
-template <typename T>
-static std::unique_ptr<T> MoveFromFront(std::queue<std::unique_ptr<T>>& ptrs)
+static bool GetAvailableSock(std::unique_ptr<sf::TcpSocket>& sock_to_fill)
 {
-  if (ptrs.empty())
-    return nullptr;
-  std::unique_ptr<T> ptr = std::move(ptrs.front());
-  ptrs.pop();
-  return ptr;
-}
+  bool sock_filled = false;
 
-static std::unique_ptr<sf::TcpSocket> GetNextSock()
-{
   std::lock_guard<std::mutex> lk(s_cs_gba);
-  return MoveFromFront(s_waiting_socks);
+
+  if (!s_waiting_socks.empty())
+  {
+    sock_to_fill = std::move(s_waiting_socks.front());
+    s_waiting_socks.pop();
+    sock_filled = true;
+  }
+
+  return sock_filled;
 }
 
-static std::unique_ptr<sf::TcpSocket> GetNextClock()
+static bool GetNextClock(std::unique_ptr<sf::TcpSocket>& sock_to_fill)
 {
+  bool sock_filled = false;
+
   std::lock_guard<std::mutex> lk(s_cs_gba_clk);
-  return MoveFromFront(s_waiting_clocks);
+
+  if (!s_waiting_clocks.empty())
+  {
+    sock_to_fill = std::move(s_waiting_clocks.front());
+    s_waiting_clocks.pop();
+    sock_filled = true;
+  }
+
+  return sock_filled;
 }
 
 GBASockServer::GBASockServer(int device_number)
@@ -258,7 +251,7 @@ void GBASockServer::Disconnect()
 void GBASockServer::ClockSync()
 {
   if (!m_clock_sync)
-    if (!GetNextClock())
+    if (!GetNextClock(m_clock_sync))
       return;
 
   u32 time_slice = 0;
@@ -289,7 +282,7 @@ void GBASockServer::ClockSync()
     m_clock_sync = nullptr;
   }
 }
-
+/*
 bool GBASockServer::Connect()
 {
   if (!IsConnected())
@@ -301,29 +294,57 @@ bool GBASockServer::IsConnected()
 {
   return static_cast<bool>(m_client);
 }
-
-void GBASockServer::Send(const u8* si_buffer)
+*/
+void GBASockServer::Send(u8* si_buffer)
 {
-  if (!Connect())
-    return;
+  if (!m_client)
+    if (!GetAvailableSock(m_client))
+      return;
 
-  std::array<u8, SEND_MAX_SIZE> send_data;
-  for (size_t i = 0; i < send_data.size(); i++)
+  for (int i = 0; i < 5; i++)
     send_data[i] = si_buffer[i ^ 3];
 
-  u8 cmd = send_data[0];
-  if (cmd != CMD_STATUS)
-    m_booted = true;
+  cmd = (u8)send_data[0];
+
+  //Logging of send data
+  
+  std::string output;
+
+  if (cmd == CMD_STATUS)
+  output = StringFromFormat("\n\n %d: STATUS (00) [> %02x]\n", Movie::GetCurrentFrame(), (u8)send_data[4]);
+  else if (cmd == CMD_READ)
+  output = StringFromFormat("\n\n %d: READ (14) [> %02x]\n", Movie::GetCurrentFrame(), (u8)send_data[4]);
+  else if (cmd == CMD_WRITE)
+  output = StringFromFormat("\n\n %d: WRITE (15) [> %02x %02x %02x %02x]\n", Movie::GetCurrentFrame(),
+  (u8)send_data[1], (u8)send_data[2],
+  (u8)send_data[3], (u8)send_data[4]);
+  else if (cmd == CMD_RESET)
+  output = StringFromFormat("\n\n %d: RESET (ff) [> %02x]\n", Movie::GetCurrentFrame(), (u8)send_data[4]);
+
+  outputFile.WriteBytes(output.data(), output.size());
+  
+
+#ifdef _DEBUG
+  NOTICE_LOG(SERIALINTERFACE, "%01d cmd %02x [> %02x%02x%02x%02x]",
+    device_number,
+    (u8)send_data[0], (u8)send_data[1], (u8)send_data[2],
+    (u8)send_data[3], (u8)send_data[4]);
+#endif
 
   m_client->setBlocking(false);
   sf::Socket::Status status;
   if (cmd == CMD_WRITE)
-    status = m_client->send(send_data.data(), send_data.size());
+    status = m_client->send(send_data, sizeof(send_data));
   else
-    status = m_client->send(send_data.data(), 1);
+    status = m_client->send(send_data, 1);
+
+  if (cmd != CMD_STATUS)
+    m_booted = true;
 
   if (status == sf::Socket::Disconnected)
     Disconnect();
+
+  time_cmd_sent = CoreTiming::GetTicks();
 }
 
 int GBASockServer::Receive(u8* si_buffer)
@@ -3958,6 +3979,7 @@ int GBASockServer::CreateFakeResponse(u8* si_buffer)
   return (int)num_received;
 }
 
+
 CSIDevice_GBA::CSIDevice_GBA(SIDevices device, int device_number) : ISIDevice(device, device_number)
 , GBASockServer(device_number)
 {
@@ -3993,6 +4015,11 @@ CSIDevice_GBA::CSIDevice_GBA(SIDevices device, int device_number) : ISIDevice(de
   //Movie Stuff
   Movie::tunerStatus = 1;
   Movie::tunerExecuteID = 0;
+}
+
+CSIDevice_GBA::~CSIDevice_GBA()
+{
+  GBASockServer::Disconnect();
 }
 
 int CSIDevice_GBA::RunBuffer(u8* buffer, int length)

@@ -52,7 +52,7 @@ private:
 
 protected:
 
-  wxStaticText* m_staticText;
+  wxStaticText * m_staticText;
   wxTextCtrl* m_text_ctrl;
   wxButton* m_button_start;
   wxChoice* m_choice_type;

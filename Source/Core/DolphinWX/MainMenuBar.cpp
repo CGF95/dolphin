@@ -19,7 +19,7 @@
 #include "DolphinWX/Frame.h"
 #include "DolphinWX/Globals.h"
 #include "DolphinWX/WxUtils.h"
-#include "DolphinWX/Tuner/TWWTunerInput.h"
+#include "DolphinWX/ZeldaEdition/TWWTunerInput.h"
 
 wxDEFINE_EVENT(EVT_POPULATE_PERSPECTIVES_MENU, MainMenuBar::PopulatePerspectivesEvent);
 
@@ -149,6 +149,7 @@ wxMenu* MainMenuBar::CreateMovieMenu() const
   movie_menu->Append(IDM_STOP_RECORD, _("Stop Playing/Recording Input"));
   movie_menu->Append(IDM_RECORD_EXPORT, _("Export Recording..."));
   movie_menu->AppendCheckItem(IDM_RECORD_READ_ONLY, _("&Read-Only Mode"));
+  movie_menu->Append(IDM_TUNERINPUT, _("Tingle Tuner Input"));
   movie_menu->Append(IDM_TAS_INPUT, _("TAS Input"));
   movie_menu->AppendSeparator();
   movie_menu->AppendCheckItem(IDM_TOGGLE_PAUSE_MOVIE, _("Pause at End of Movie"));
@@ -219,8 +220,6 @@ wxMenu* MainMenuBar::CreateToolsMenu() const
   wiimote_menu->AppendCheckItem(IDM_CONNECT_BALANCEBOARD, _("Connect Balance Board"));
 
   auto* const tools_menu = new wxMenu;
-  tools_menu->Append(IDM_TUNER_INPUT, _("Tingle Tuner Input"));
-  tools_menu->AppendSeparator();
   tools_menu->Append(IDM_MEMCARD, _("&Memory Card Manager (GC)"));
   tools_menu->Append(IDM_IMPORT_SAVE, _("Import Wii Save..."));
   tools_menu->Append(IDM_EXPORT_ALL_SAVE, _("Export All Wii Saves"));

@@ -11,6 +11,9 @@
 
 #include "Common/CommonTypes.h"
 
+//Dragonbane
+#include "DolphinWX/Main.h"
+
 struct BootParameters;
 
 struct GCPadStatus;

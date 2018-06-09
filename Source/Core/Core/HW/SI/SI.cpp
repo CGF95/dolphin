@@ -17,6 +17,7 @@
 #include "Core/HW/ProcessorInterface.h"
 #include "Core/HW/SI/SI_DeviceGBA.h"
 #include "Core/HW/SystemTimers.h"
+#include "Core/HW/VideoInterface.h"
 #include "Core/Movie.h"
 #include "Core/NetPlayProto.h"
 
@@ -364,21 +365,24 @@ void Init()
     s_channel[i].in_hi.hex = 0;
     s_channel[i].in_lo.hex = 0;
 
-    if (Movie::IsMovieActive())
-    {
-      if (Movie::IsUsingPad(i))
-      {
-        SIDevices current = SConfig::GetInstance().m_SIDevice[i];
-        // GC pad-compatible devices can be used for both playing and recording
-        if (SIDevice_IsGCController(current))
-          AddDevice(Movie::IsUsingBongo(i) ? SIDEVICE_GC_TARUKONGA : current, i);
-        else
-          AddDevice(Movie::IsUsingBongo(i) ? SIDEVICE_GC_TARUKONGA : SIDEVICE_GC_CONTROLLER, i);
-      }
-      else
-      {
-        AddDevice(SIDEVICE_NONE, i);
-      }
+	//Dragonbane: Added GBA for TASing
+	if (Movie::IsMovieActive())
+	{
+		if (Movie::IsUsingPad(i))
+		{
+			if (Movie::IsUsingBongo(i))
+				AddDevice(SIDEVICE_GC_TARUKONGA, i);
+			else
+				AddDevice(SIDEVICE_GC_CONTROLLER, i);
+		}
+		else if (Movie::IsUsingGBA(i))
+		{
+			AddDevice(SIDEVICE_GC_GBA, i);
+		}
+		else
+		{
+			AddDevice(SIDEVICE_NONE, i);
+		}
     }
     else if (!NetPlay::IsNetPlayRunning())
     {
@@ -625,4 +629,4 @@ u32 GetPollXLines()
   return s_poll.X;
 }
 
-}  // end of namespace SerialInterface
+} // end of namespace SerialInterface

@@ -265,7 +265,7 @@
     <ClCompile Include="DolphinSlider.cpp">
       <Filter>GUI\Widgets</Filter>
     </ClCompile>
-    <ClCompile Include="Tuner\TWWTunerInput.cpp">
+    <ClCompile Include="ZeldaEdition\TWWTunerInput.cpp">
       <Filter>GUI\Tuner</Filter>
     </ClCompile>
   </ItemGroup>
@@ -492,7 +492,7 @@
     <ClInclude Include="DolphinSlider.h">
       <Filter>GUI\Widgets</Filter>
     </ClInclude>
-    <ClInclude Include="Tuner\TWWTunerInput.h">
+    <ClInclude Include="ZeldaEdition\TWWTunerInput.h">
       <Filter>GUI\Tuner</Filter>
     </ClInclude>
   </ItemGroup>

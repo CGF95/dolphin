@@ -20,10 +20,10 @@
 #include <wx/choice.h>
 #include <wx/textctrl.h>
 #include <wx/sizer.h>
+#include <wx/wx.h>
 
 #include "Common/CommonTypes.h"
 #include <string>
-
 
 
 class wxWindow;
@@ -52,7 +52,7 @@ private:
 
 protected:
 
-  wxStaticText * m_staticText;
+  wxStaticText* m_staticText;
   wxTextCtrl* m_text_ctrl;
   wxButton* m_button_start;
   wxChoice* m_choice_type;

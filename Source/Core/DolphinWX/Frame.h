@@ -22,7 +22,7 @@
 #include "Common/Event.h"
 #include "Core/ConfigManager.h"
 #include "DolphinWX/Globals.h"
-#include "DolphinWX/Tuner/TWWTunerInput.h"
+#include "DolphinWX/ZeldaEdition/TWWTunerInput.h"
 
 #if defined(HAVE_X11) && HAVE_X11
 #include "UICommon/X11Utils.h"

@@ -1401,6 +1401,7 @@ void CallGCInputManip(GCPadStatus* PadStatus, int controllerID)
 {
   if (s_gc_manip_func)
     s_gc_manip_func(PadStatus, controllerID);
+  
 }
 // NOTE: CPU Thread
 void CallWiiInputManip(u8* data, WiimoteEmu::ReportFeatures rptf, int controllerID, int ext,

@@ -15,6 +15,7 @@
 #include <wx/app.h>
 #include <wx/aui/framemanager.h>
 #include <wx/bitmap.h>
+#include <wx/dirdlg.h>
 #include <wx/filedlg.h>
 #include <wx/filefn.h>
 #include <wx/menu.h>
@@ -88,7 +89,7 @@
 #include "DolphinWX/TASInputDlg.h"
 #include "DolphinWX/WxEventUtils.h"
 #include "DolphinWX/WxUtils.h"
-#include "DolphinWX/Tuner/TWWTunerInput.h"
+#include "DolphinWX/ZeldaEdition/TWWTunerInput.h"
 
 #include "InputCommon/ControllerInterface/ControllerInterface.h"
 
@@ -161,6 +162,7 @@ void CFrame::BindMenuBarEvents()
   Bind(wxEVT_MENU, &CFrame::OnRecordExport, this, IDM_RECORD_EXPORT);
   Bind(wxEVT_MENU, &CFrame::OnRecordReadOnly, this, IDM_RECORD_READ_ONLY);
   Bind(wxEVT_MENU, &CFrame::OnTASInput, this, IDM_TAS_INPUT);
+  Bind(wxEVT_MENU, &CFrame::OnTWWTunerInput, this, IDM_TUNERINPUT);
   Bind(wxEVT_MENU, &CFrame::OnTogglePauseMovie, this, IDM_TOGGLE_PAUSE_MOVIE);
   Bind(wxEVT_MENU, &CFrame::OnShowLag, this, IDM_SHOW_LAG);
   Bind(wxEVT_MENU, &CFrame::OnShowFrameCount, this, IDM_SHOW_FRAME_COUNT);
@@ -177,7 +179,6 @@ void CFrame::BindMenuBarEvents()
   Bind(wxEVT_MENU, &CFrame::OnConfigHotkey, this, IDM_CONFIG_HOTKEYS);
 
   // Tools menu
-  Bind(wxEVT_MENU, &CFrame::OnTWWTunerInput, this, IDM_TUNER_INPUT);
   Bind(wxEVT_MENU, &CFrame::OnMemcard, this, IDM_MEMCARD);
   Bind(wxEVT_MENU, &CFrame::OnImportSave, this, IDM_IMPORT_SAVE);
   Bind(wxEVT_MENU, &CFrame::OnExportAllSaves, this, IDM_EXPORT_ALL_SAVE);
@@ -396,7 +397,13 @@ void CFrame::OnTASInput(wxCommandEvent& event)
       m_tas_input_dialogs[i]->SetTitle(
           wxString::Format(_("TAS Input - GameCube Controller %d"), i + 1));
     }
-
+    /*
+    //CGF: TODO
+    if (SConfig::GetInstance().m_SIDevice[i] == SerialInterface::SI_GBA)
+    {
+      m_TWWTunerInput_dialog->Show();
+    }
+    */
     if (g_wiimote_sources[i] == WIIMOTE_SRC_EMU &&
         !(Core::IsRunning() && !SConfig::GetInstance().bWii))
     {

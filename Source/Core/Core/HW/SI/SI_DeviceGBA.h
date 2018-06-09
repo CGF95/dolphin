@@ -16,57 +16,59 @@
 
 namespace SerialInterface
 {
-u8 GetNumConnected();
-int GetTransferTime(u8 cmd);
-void GBAConnectionWaiter_Shutdown();
 
-class GBASockServer
-{
-public:
-  GBASockServer(int device_number);
-  ~GBASockServer();
+	u8 GetNumConnected();
+	int GetTransferTime(u8 cmd);
+	void GBAConnectionWaiter_Shutdown();
 
-  void Disconnect();
-  //bool Connect();
-  //bool IsConnected();
+	class GBASockServer
+	{
+	public:
+		GBASockServer(int device_number);
+		~GBASockServer();
 
-  void ClockSync();
+		void Disconnect();
 
-  void Send(u8* si_buffer);
-  int Receive(u8* si_buffer);
+		void ClockSync();
 
-  //Dragonbane: Fake GBA
-  int CreateFakeResponse(u8* si_buffer);
+		void Send(u8* si_buffer);
+		int Receive(u8* si_buffer);
 
-private:
-  std::unique_ptr<sf::TcpSocket> m_client;
-  std::unique_ptr<sf::TcpSocket> m_clock_sync;
-  unsigned char send_data[5];
-  unsigned char recv_data[5];
+		//Dragonbane: Fake GBA
+		int CreateFakeResponse(u8* si_buffer);
 
-  u64 time_cmd_sent;
-  u64 m_last_time_slice;
-  u8 device_number;
-  u8 cmd;
-  bool m_booted;
-};
+	private:
+		std::unique_ptr<sf::TcpSocket> client;
+		std::unique_ptr<sf::TcpSocket> clock_sync;
+		unsigned char send_data[5];
+		unsigned char recv_data[5];
 
-class CSIDevice_GBA : public ISIDevice, private GBASockServer
-{
-public:
-	CSIDevice_GBA(SIDevices device, int device_number);
-  ~CSIDevice_GBA();
-	virtual int RunBuffer(u8* buffer, int length) override;
-	virtual int TransferInterval() override;
-	virtual bool GetData(u32& hi, u32& low) override;
-	virtual void SendCommand(u32 command, u8 poll) override;
+		u64 time_cmd_sent;
+		u64 last_time_slice;
+		u8 device_number;
+		u8 cmd;
+		bool booted;
+	};
 
-	void DoState(PointerWrap& p) override;
+	class CSIDevice_GBA : public ISIDevice, private GBASockServer
+	{
+	public:
+		CSIDevice_GBA(SIDevices device, int device_number);
+		~CSIDevice_GBA();
 
-private:
-  u8 send_data[5];
-  int num_data_received;
-  u64 timestamp_sent;
-  bool waiting_for_response;
-};
+		virtual int RunBuffer(u8* buffer, int length) override;
+		virtual int TransferInterval() override;
+
+		virtual bool GetData(u32& hi, u32& low) override { return false; }
+		virtual void SendCommand(u32 cmd, u8 poll) override {}
+
+		//Dragonbane: Savestate support
+		virtual void DoState(PointerWrap& p) override;
+
+	private:
+		u8 send_data[5];
+		int num_data_received;
+		u64 timestamp_sent;
+		bool waiting_for_response;
+	};
 }  // namespace SerialInterface

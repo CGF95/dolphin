@@ -48,7 +48,7 @@ const u64 BYTES_PER_SECOND = BITS_PER_SECOND / 8;
 //Dragonbane: Custom Tuner Stuff
 
 //LOG FILE
-static File::IOFile outputFile("GBA.log", "wb");
+//static File::IOFile outputFile("GBA.log", "wb");
 static u64 frameTarget = 0;
 
 //Connection variables
@@ -484,7 +484,7 @@ int GBASockServer::CreateFakeResponse(u8* si_buffer)
 
 
 	//REPORT CODE FOR PROFILING
-	
+	/*
 	bool reportEnd = false;
 
 	if (Movie::tunerExecuteID > 0 && Movie::tunerExecuteID < 18 || Movie::tunerExecuteID > 19)
@@ -555,7 +555,7 @@ int GBASockServer::CreateFakeResponse(u8* si_buffer)
 			reportedActionID = 0;
 		}
 	}
-
+  */
 
 
 
@@ -4166,7 +4166,7 @@ int CSIDevice_GBA::TransferInterval()
 // Dragonbane: Savestate support
 void CSIDevice_GBA::DoState(PointerWrap& p)
 {
-	if (!p.GetMode() == PointerWrap::MODE_READ > 2)
+	if (!p.GetMode() == PointerWrap::MODE_READ)
 	{
 		p.Do(isEnabled);
 		p.Do(isConnecting);

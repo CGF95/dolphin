@@ -305,6 +305,7 @@
     <ClCompile Include="Debugger\MemoryWidget.cpp" />
     <ClCompile Include="Debugger\MemoryViewWidget.cpp" />
     <ClCompile Include="FIFOPlayerWindow.cpp" />
+    <ClCompile Include="QtTunerInput.cpp" />
     <ClCompile Include="QtUtils\WinIconHelper.cpp" />
     <ClCompile Include="TAS\GCTASInputWindow.cpp" />
     <ClCompile Include="TAS\WiiTASInputWindow.cpp" />
@@ -360,6 +361,7 @@
   <ItemGroup>
     <ClInclude Include="Config\Mapping\MappingCommon.h" />
     <ClInclude Include="Debugger\RegisterColumn.h" />
+    <ClInclude Include="QtTunerInput.h" />
     <ClInclude Include="QtUtils\ActionHelper.h" />
     <ClInclude Include="QtUtils\ImageConverter.h" />
     <ClInclude Include="QtUtils\QueueOnObject.h" />

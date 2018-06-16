@@ -48,6 +48,7 @@ void MainMenuBar::AddMenus()
   Append(CreateFileMenu(), _("&File"));
   Append(CreateEmulationMenu(), _("&Emulation"));
   Append(CreateMovieMenu(), _("&Movie"));
+  Append(CreateZeldaEditionMenu(), _("&Zelda Edition"));
   Append(CreateOptionsMenu(), _("&Options"));
   Append(CreateToolsMenu(), _("&Tools"));
   Append(CreateViewMenu(), _("&View"));
@@ -139,6 +140,18 @@ wxMenu* MainMenuBar::CreateEmulationMenu() const
   return emulation_menu;
 }
 
+wxMenu* MainMenuBar::CreateZeldaEditionMenu() const
+{
+	auto* const zelda_menu = new wxMenu;
+	auto* const zelda_sub_menu = new wxMenu;
+	zelda_sub_menu->Append(IDM_TUNERINPUT, _("Tingle Tuner Input"));
+	zelda_sub_menu->AppendSeparator();
+	zelda_menu->AppendSubMenu(
+		zelda_sub_menu, _("The Wind Waker"),
+		_("Use the Tingle Tuner TAS Input by Dragonbane."));
+	return zelda_menu;
+}
+
 wxMenu* MainMenuBar::CreateMovieMenu() const
 {
   auto* const movie_menu = new wxMenu;
@@ -149,7 +162,6 @@ wxMenu* MainMenuBar::CreateMovieMenu() const
   movie_menu->Append(IDM_STOP_RECORD, _("Stop Playing/Recording Input"));
   movie_menu->Append(IDM_RECORD_EXPORT, _("Export Recording..."));
   movie_menu->AppendCheckItem(IDM_RECORD_READ_ONLY, _("&Read-Only Mode"));
-  movie_menu->Append(IDM_TUNERINPUT, _("Tingle Tuner Input"));
   movie_menu->Append(IDM_TAS_INPUT, _("TAS Input"));
   movie_menu->AppendSeparator();
   movie_menu->AppendCheckItem(IDM_TOGGLE_PAUSE_MOVIE, _("Pause at End of Movie"));

@@ -40,6 +40,7 @@
 #include "Core/FifoPlayer/FifoRecorder.h"
 #include "Core/HW/VideoInterface.h"
 #include "Core/Host.h"
+#include "Core/HW/Memmap.h" //CGF
 #include "Core/Movie.h"
 
 #include "VideoCommon/AVIDump.h"
@@ -385,12 +386,18 @@ void Renderer::DrawDebugText()
   //Dragonbane: Recording Notice
   if (Movie::IsRecordingInput())
   {
-    g_renderer->RenderText("RECORDING", 20, 0, 0xFFFF00FF);
+    g_renderer->RenderText("Recording", 20, 0, 0xFFFF00FF);
   }
   else if (Movie::IsPlayingInput())
   {
-    g_renderer->RenderText("PLAYBACK", 20, 0, 0xFF00FF00);
+    g_renderer->RenderText("Playback", 20, 0, 0xFF00FF00);
   }
+
+  if (Movie::IsRecordingInput())
+  {
+    g_renderer->RenderText("Recording", 20, 0, 0xFFFF00FF);
+  }
+
 
   std::string gameID = SConfig::GetInstance().GetGameID();
   if (!gameID.compare("GZLJ01"))
@@ -413,12 +420,12 @@ void Renderer::DrawDebugText()
       tunerInfo.append("N/A");
 
     g_renderer->RenderText(tunerInfo, 200, 0, 0xFFFFFF00);
-  //TODO: Create Tuner Action Info
-  /*
+
+  //TODO: Make Tuner Action Info more accurate
   std::string TWWgameID = SConfig::GetInstance().GetGameID();
   if (!TWWgameID.compare("GZLJ01"))
   {
-    std::string tunerActionInfo = "Current Tuner Action: ";
+    std::string tunerActionInfo = "Tuner Action: ";
     if (TWWgameID.compare("GZLJ01"))
       tunerActionInfo.append("");
     else if (Movie::tunerExecuteID == 1) //Up
@@ -440,7 +447,7 @@ void Renderer::DrawDebugText()
     else
       tunerActionInfo.append(""); //Unknown / None
     g_renderer->RenderText(tunerActionInfo, 200, 20, 0xFFFFFF00);
-    */
+    }
   }
 }
 

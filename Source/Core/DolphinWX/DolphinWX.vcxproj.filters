@@ -31,7 +31,7 @@
     <Filter Include="GUI\ISOProperties">
       <UniqueIdentifier>{d72aa7f0-ed24-4fed-9d3a-38b82d1b753c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="GUI\Tuner">
+    <Filter Include="GUI\ZeldaEdition">
       <UniqueIdentifier>{1d087454-ae48-4d1f-8803-8b3242394101}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -266,7 +266,7 @@
       <Filter>GUI\Widgets</Filter>
     </ClCompile>
     <ClCompile Include="ZeldaEdition\TWWTunerInput.cpp">
-      <Filter>GUI\Tuner</Filter>
+      <Filter>GUI\ZeldaEdition</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -493,7 +493,7 @@
       <Filter>GUI\Widgets</Filter>
     </ClInclude>
     <ClInclude Include="ZeldaEdition\TWWTunerInput.h">
-      <Filter>GUI\Tuner</Filter>
+      <Filter>GUI\ZeldaEdition</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -41,6 +41,7 @@
 #include "Core/HW/CPU.h"
 #include "Core/HW/DVD/DVDInterface.h"
 #include "Core/HW/EXI/EXI_DeviceIPL.h"
+#include "Core/HW/Memmap.h"
 #include "Core/HW/ProcessorInterface.h"
 #include "Core/HW/SI/SI.h"
 #include "Core/HW/Wiimote.h"
@@ -68,6 +69,13 @@ namespace Movie
 static bool s_bReadOnly = true;
 static u32 s_rerecords = 0;
 static PlayMode s_playMode = MODE_NONE;
+
+//Dragonbane: Auto Roll Stuff
+int roll_timer = 0;
+bool roll_enabled = false;
+bool first_roll = false;
+bool checkSave = false;
+bool uncheckSave = false;
 
 // Dragonbane: Tuner Stuff
 u8 tunerActionID = 0;
@@ -169,6 +177,407 @@ std::string GetInputDisplay()
       if ((s_controllers & (1 << i)) != 0)
         input_display += s_InputDisplay[i] + '\n';
     }
+    //Dragonbane
+    std::string gameID = SConfig::GetInstance().GetGameID();
+    std::string iniContent;
+
+    bool success = File::ReadFileToString(File::GetExeDirectory() + "\\InfoDisplay\\" + gameID + ".ini", iniContent);
+
+    if (success)
+    {
+      int lineCounter = 0;
+      bool inProgress = true;
+      input_display.append("\n");
+
+      while (inProgress)
+      {
+        lineCounter++;
+
+        std::string lineName = StringFromFormat("Line%i", lineCounter);
+
+        std::string::size_type loc = iniContent.find(lineName, 0);
+        if (loc == std::string::npos)
+        {
+          inProgress = false;
+          break;
+        }
+
+        iniContent = iniContent.substr(loc);
+        iniContent = iniContent.substr(iniContent.find("\"", 0) + 1);
+
+        std::string line = iniContent.substr(0, iniContent.find("\"", 0));
+        std::string blockContent = iniContent.substr(0, iniContent.find("End Line", 0));
+
+        std::string::size_type locNext = line.find("%", 0);
+        std::string subLine = line;
+        int argCounter = 0;
+
+        while (locNext != std::string::npos)
+        {
+          argCounter++;
+
+          std::string currSectionOutput = subLine.substr(0, locNext);
+          subLine = subLine.substr(locNext + 1);
+          std::string currIdenti = subLine.substr(0, 3);
+
+          int numBytes = atoi(currIdenti.substr(1, 1).c_str());
+          std::string identifier = "%" + currIdenti.substr(0, 1);
+          u32 readAddress;
+
+          subLine = subLine.substr(3);
+
+          std::string nextArgName = StringFromFormat("Arg%i", argCounter);
+
+          std::string::size_type locNextArg = blockContent.find(nextArgName, 0);
+
+          if (locNextArg == std::string::npos)
+            break;
+
+          std::string argString = blockContent.substr(locNextArg);
+          argString = argString.substr(argString.find("=", 0) + 1);
+          argString = argString.substr(0, argString.find(";", 0));
+
+          std::string::size_type locPlus = argString.find("+", 0);
+          std::string::size_type locHint = argString.find(">>", 0);
+
+          std::string currHint;
+
+          if (locHint != std::string::npos)
+            currHint = argString.substr(locHint + 3);
+
+          if (locPlus == std::string::npos)
+          {
+            std::string arguString;
+
+            if (locHint != std::string::npos)
+            {
+              arguString = argString.substr(0, locHint - 1);
+            }
+            else
+            {
+              arguString = argString;
+            }
+
+            readAddress = strtol(arguString.c_str(), nullptr, 16);
+          }
+          else
+          {
+            u32 pointerAddress;
+            u32 offset;
+
+            pointerAddress = strtol(argString.substr(0, locPlus - 1).c_str(), nullptr, 16);
+
+            std::string arguString = argString.substr(locPlus + 2);
+
+            if (locHint != std::string::npos)
+            {
+              locHint = arguString.find(">>", 0);
+
+              arguString = arguString.substr(0, locHint - 1);
+            }
+
+            offset = strtol(arguString.c_str(), nullptr, 16);
+
+            u32 pointer = Memory::Read_U32(pointerAddress);
+
+            if (pointer > 0x80000000)
+            {
+              pointer -= 0x80000000;
+
+              readAddress = pointer + offset;
+            }
+            else
+            {
+              input_display.append(currSectionOutput + "N/A");
+              locNext = subLine.find("%", 0);
+              continue;
+            }
+
+          }
+
+          std::string finalOutput;
+
+          if (identifier.compare("%s") == 0)
+          {
+            std::string outputString = Memory::Read_String(readAddress, numBytes);
+
+            finalOutput = StringFromFormat(identifier.c_str(), outputString.c_str());
+          }
+          else if (identifier.compare("%f") == 0)
+          {
+            float outputFloat = Memory::Read_F32(readAddress);
+            finalOutput = StringFromFormat(identifier.c_str(), outputFloat);
+          }
+          else if (numBytes == 4)
+          {
+            u32 output4Bytes = Memory::Read_U32(readAddress);
+            finalOutput = StringFromFormat(identifier.c_str(), output4Bytes);
+          }
+          else if (numBytes == 2)
+          {
+            u16 output2Bytes = Memory::Read_U16(readAddress);
+
+            //Special Formatting for 2 Byte
+            if (currHint.compare("Degrees") == 0)
+            {
+              double degrees = output2Bytes;
+              degrees = (degrees / 182.04) + 0.5;
+
+              int finalDegrees = (int)degrees;
+
+              if (finalDegrees >= 360)
+                finalDegrees = finalDegrees - 360;
+
+              std::string newIdentifier = identifier;
+              newIdentifier.append(" (%i DEG)");
+
+              finalOutput = StringFromFormat(newIdentifier.c_str(), output2Bytes, finalDegrees);
+            }
+            else if (currHint.compare("Time") == 0)
+            {
+              //ToD
+              int time = output2Bytes;
+              int hours = time / 256;
+
+              float minutes = (float)time / 256;
+              minutes = (minutes - hours) * 256;
+
+              int finalMinutes = (int)minutes;
+
+              std::stringstream ss;
+
+              ss << finalMinutes;
+              std::string minutesString = ss.str();
+
+              if (finalMinutes < 10)
+                minutesString = "0" + minutesString;
+
+              std::string newIdentifier = identifier;
+              newIdentifier.append(":%s");
+
+              finalOutput = StringFromFormat(newIdentifier.c_str(), hours, minutesString.c_str());
+            }
+            else
+            {
+              finalOutput = StringFromFormat(identifier.c_str(), output2Bytes);
+            }
+          }
+          else if (numBytes == 1)
+          {
+            u8 output1Byte = Memory::Read_U8(readAddress);
+            finalOutput = StringFromFormat(identifier.c_str(), output1Byte);
+          }
+
+          if (finalOutput.length() == 0)
+          {
+            finalOutput = "N/A";
+          }
+          else
+          {
+            if (locHint == std::string::npos)
+            {
+              if (identifier.compare("%X") == 0 || identifier.compare("%x") == 0)
+              {
+                if (finalOutput.length() < 2)
+                {
+                  finalOutput = "0" + finalOutput;
+                }
+
+              }
+            }
+          }
+
+          std::string completeOutput = StringFromFormat("%s%s", currSectionOutput.c_str(), finalOutput.c_str());
+
+          input_display.append(completeOutput);
+
+          locNext = subLine.find("%", 0);
+        }
+
+        input_display.append("\n");
+      }
+
+    }
+
+    /*
+    u32 charPointerAddress;
+    u32 stageAddress;
+    u32 roomAddress;
+    u32 stateAddress;
+    u32 spawnAddress;
+    u32 todAddress;
+    u32 bossAddress;
+    bool isTP = false;
+    bool isTWW = false;
+    if (!gameID.compare("GZ2E01"))
+    {
+    charPointerAddress = 0x3dce54;
+    stageAddress = 0x40afc0;
+    roomAddress = 0x42d3e0;
+    stateAddress = 0x3a66b3;
+    spawnAddress = 0x40afc9;
+    todAddress = 0x3dc410;
+    bossAddress = 0x450c98;
+    isTP = true;
+    }
+    else if (!gameID.compare("GZ2P01"))
+    {
+    charPointerAddress = 0x3dedf4;
+    stageAddress = 0x40cf60;
+    roomAddress = 0x42f3a0;
+    stateAddress = 0x3a8393;
+    spawnAddress = 0x40cf69;
+    todAddress = 0x3de3b0;
+    bossAddress = 0x452c58;
+    isTP = true;
+    }
+    else if (!gameID.compare("GZLJ01")) //JP TWW
+    {
+    charPointerAddress = 0x3ad860;
+    stageAddress = 0x3bd23c;
+    roomAddress = 0x3e9f48;
+    stateAddress = 0x3b8000;
+    spawnAddress = 0x3bd245;
+    todAddress = 0x396230;
+    bossAddress = 0x3bd3a2; //Event State
+    isTWW = true;
+    }
+    //TP Stats NTSC/PAL
+    if (isTP)
+    {
+    //Read Character Info (by Rachel)
+    std::string strSpeed = "";
+    u32 characterpointer = Memory::Read_U32(charPointerAddress);
+    //std::string strSpeed2;
+    //strSpeed2 = StringFromFormat("\nPoint 1: %d\n", characterpointer);
+    //inputDisplay.append(strSpeed2);
+    if (characterpointer > 0x80000000)
+    {
+    characterpointer -= 0x80000000;
+    //u32 characterpointer2 = characterpointer + 0x5c;
+    float speed = Memory::Read_F32(characterpointer + 0x5c);
+    u16 facing = Memory::Read_U16(characterpointer + 0x16);
+    double degrees = facing;
+    degrees = (degrees / 182.04) + 0.5;
+    int finalDegrees = (int)degrees;
+    if (finalDegrees >= 360)
+    finalDegrees = finalDegrees - 360;
+    //strSpeed = StringFromFormat("\nPoint 2: %d | Point 3: %d | Speed: %f | Facing: %d (%i Deg)\n", characterpointer, characterpointer2, speed, facing, finalDegrees);
+    strSpeed = StringFromFormat("\nSpeed: %f | Facing: %d (%i DEG)\n", speed, facing, finalDegrees);
+    }
+    else
+    {
+    strSpeed = "\nSpeed: N/A | Facing: N/A\n";
+    }
+    inputDisplay.append(strSpeed);
+    //Read Map Info
+    std::string strMap = "";
+    std::string stageName = Memory::Read_String(stageAddress, 7);
+    u8 roomID = Memory::Read_U8(roomAddress);
+    std::string stateID = Memory::Read_String(stateAddress, 1);
+    u8 spawnID = Memory::Read_U8(spawnAddress);
+    int spawnTemp = spawnID;
+    std::stringstream ss;
+    ss << std::hex << spawnTemp;
+    std::string spawnString = ss.str();
+    std::transform(spawnString.begin(), spawnString.end(), spawnString.begin(), ::toupper);
+    if (spawnString.length() < 2)
+    spawnString = StringFromFormat("0%s", spawnString);
+    if (stageName.find('_') == std::string::npos)
+    stageName = "N/A";
+    strMap = StringFromFormat("Stage: %s | Room: %d | State: %s | SpawnPoint: %s\n", stageName, roomID, stateID, spawnString);
+    inputDisplay.append(strMap);
+    //Misc Info (Boss Flag, ToD)
+    std::string strMisc = "";
+    //ToD
+    u16 ToD = Memory::Read_U16(todAddress);
+    int time = ToD;
+    int hours = time / 256;
+    float minutes = (float)time / 256;
+    minutes = (minutes - hours) *256;
+    int finalMinutes = (int)minutes;
+    std::stringstream ss2;
+    ss2 << finalMinutes;
+    std::string minutesString = ss2.str();
+    if (finalMinutes < 10)
+    minutesString = "0" + minutesString;
+    //Boss Flag
+    u8 bossFlag = Memory::Read_U8(bossAddress);
+    strMisc = StringFromFormat("ToD: %d:%s | BossFlag: %d\n", hours, minutesString, bossFlag);
+    inputDisplay.append(strMisc);
+    }
+    //TWW Stats JP
+    if (isTWW)
+    {
+    //Read Character Info
+    std::string strSpeed = "";
+    u32 characterpointer = Memory::Read_U32(charPointerAddress);
+    //std::string strSpeed2;
+    //strSpeed2 = StringFromFormat("\nPoint 1: %d\n", characterpointer);
+    //inputDisplay.append(strSpeed2);
+    if (characterpointer > 0x80000000)
+    {
+    characterpointer -= 0x80000000;
+    //u32 characterpointer2 = characterpointer + 0x5c;
+    float speed = Memory::Read_F32(characterpointer + 0x34E4);
+    u16 facing = Memory::Read_U16(0x3ea3d2);
+    double degrees = facing;
+    degrees = (degrees / 182.04) + 0.5;
+    int finalDegrees = (int)degrees;
+    if (finalDegrees >= 360)
+    finalDegrees = finalDegrees - 360;
+    //strSpeed = StringFromFormat("\nPoint 2: %d | Point 3: %d | Speed: %f | Facing: %d (%i Deg)\n", characterpointer, characterpointer2, speed, facing, finalDegrees);
+    strSpeed = StringFromFormat("\nSpeed: %f | Facing: %d (%i DEG)\n", speed, facing, finalDegrees);
+    }
+    else
+    {
+    strSpeed = "\nSpeed: N/A | Facing: N/A\n";
+    }
+    inputDisplay.append(strSpeed);
+    //Read Map Info
+    std::string strMap = "";
+    std::string stageName = Memory::Read_String(stageAddress, 7);
+    u8 roomID = Memory::Read_U8(roomAddress);
+    u8 stateID = Memory::Read_U8(stateAddress);
+    u8 spawnID = Memory::Read_U8(spawnAddress);
+    int spawnTemp = spawnID;
+    std::stringstream ss;
+    ss << std::hex << spawnTemp;
+    std::string spawnString = ss.str();
+    std::transform(spawnString.begin(), spawnString.end(), spawnString.begin(), ::toupper);
+    if (spawnString.length() < 2)
+    spawnString = StringFromFormat("0%s", spawnString);
+    if (stageName.length() < 1)
+    stageName = "N/A";
+    int stateTemp = stateID;
+    std::stringstream ss2;
+    ss2 << std::hex << stateTemp;
+    std::string layerString = ss2.str();
+    if (layerString.length() > 1)
+    layerString = layerString.substr(1);
+    strMap = StringFromFormat("Stage: %s | Room: %d | Layer: %s | SpawnPoint: %s\n", stageName, roomID, layerString, spawnString);
+    inputDisplay.append(strMap);
+    //Misc Info (ToD)
+    std::string strMisc = "";
+    //ToD
+    u16 ToD = Memory::Read_U16(todAddress);
+    int time = ToD;
+    int hours = time / 256;
+    float minutes = (float)time / 256;
+    minutes = (minutes - hours) * 256;
+    int finalMinutes = (int)minutes;
+    std::stringstream ss3;
+    ss3 << finalMinutes;
+    std::string minutesString = ss3.str();
+    if (finalMinutes < 10)
+    minutesString = "0" + minutesString;
+    //Event State
+    u8 eventState = Memory::Read_U8(bossAddress);
+    strMisc = StringFromFormat("ToD: %d:%s | Event State: %d\n", hours, minutesString, eventState);
+    inputDisplay.append(strMisc);
+    }
+    */
+
   }
   return input_display;
 }

@@ -408,6 +408,23 @@ u8* GetPointer(u32 address)
   return nullptr;
 }
 
+//Dragonbane
+std::string Read_String(const u32 startAddress, int count)
+{
+  std::string output = "";
+
+  for (int i = 0; i < count; i++)
+  {
+    u32 address = startAddress + i;
+    std::string result;
+
+    Common::swap32(GetPointer(address));
+
+    output.append(result);
+  }
+  return output;
+}
+
 u8 Read_U8(u32 address)
 {
   return *GetPointer(address);
@@ -459,6 +476,30 @@ void Write_U32_Swap(u32 value, u32 address)
 void Write_U64_Swap(u64 value, u32 address)
 {
   std::memcpy(GetPointer(address), &value, sizeof(u64));
+}
+
+double Read_F64(const u32 address)
+{
+	union
+	{
+		u64 i;
+		double d;
+	} cvt;
+
+	cvt.i = Read_U64(address);
+	return cvt.d;
+}
+
+float Read_F32(const u32 address)
+{
+	union
+	{
+		u32 i;
+		float d;
+	} cvt;
+
+	cvt.i = Read_U32(address);
+	return cvt.d;
 }
 
 }  // namespace

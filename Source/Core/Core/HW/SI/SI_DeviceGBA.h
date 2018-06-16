@@ -60,7 +60,7 @@ namespace SerialInterface
 		virtual int TransferInterval() override;
 
 		virtual bool GetData(u32& hi, u32& low) override { return false; }
-		virtual void SendCommand(u32 cmd, u8 poll) override {}
+		virtual void SendCommand(u32 _cmd, u8 poll) override {}
 
 		//Dragonbane: Savestate support
 		virtual void DoState(PointerWrap& p) override;

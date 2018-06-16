@@ -47,6 +47,12 @@
     <Manifest>
       <AdditionalManifestFiles>DolphinWX.manifest;%(AdditionalManifestFiles)</AdditionalManifestFiles>
     </Manifest>
+    <ClCompile>
+      <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</TreatWarningAsError>
+    </ClCompile>
+    <ClCompile>
+      <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</TreatWarningAsError>
+    </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AboutDolphin.cpp" />

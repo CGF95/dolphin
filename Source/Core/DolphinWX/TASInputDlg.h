@@ -4,58 +4,63 @@
 
 #pragma once
 
-#include <array>
-
+#include <wx/bitmap.h>
+#include <wx/dcmemory.h>
 #include <wx/dialog.h>
 #include <wx/sizer.h>
 
 #include "Common/CommonTypes.h"
+#include "Core/HW/WiimoteEmu/WiimoteEmu.h"
+#include "InputCommon/GCPadStatus.h"
 
-class DolphinSlider;
-struct GCPadStatus;
-class wxBitmap;
 class wxCheckBox;
+class wxSlider;
 class wxStaticBitmap;
 class wxTextCtrl;
-
-namespace WiimoteEmu
-{
-struct ReportFeatures;
-}
 
 class TASInputDlg : public wxDialog
 {
 public:
-  explicit TASInputDlg(wxWindow* parent, wxWindowID id = wxID_ANY,
-                       const wxString& title = _("TAS Input"),
-                       const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize,
-                       long style = wxDEFAULT_DIALOG_STYLE | wxSTAY_ON_TOP);
+  TASInputDlg(wxWindow* parent,
+    wxWindowID id = wxID_ANY,
+    const wxString& title = _("TAS Input"),
+    const wxPoint& pos = wxDefaultPosition,
+    const wxSize& size = wxDefaultSize,
+    long style = wxDEFAULT_DIALOG_STYLE | wxSTAY_ON_TOP);
 
+  void OnCloseWindow(wxCloseEvent& event);
+  void UpdateFromSliders(wxCommandEvent& event);
+  void UpdateFromText(wxCommandEvent& event);
+  void UpdateExtraButtons(bool check, bool uncheck); //Dragonbane
+  void UpdateFromButtons(wxCommandEvent& event); //Dragonbane
+  void OnMouseDownL(wxMouseEvent& event);
+  void OnMouseUpR(wxMouseEvent& event);
+  void OnRightClickSlider(wxMouseEvent& event);
+  void ResetValues();
   void GetValues(GCPadStatus* PadStatus);
   void GetValues(u8* data, WiimoteEmu::ReportFeatures rptf, int ext, const wiimote_key key);
+  void SetTurbo(wxMouseEvent& event);
+  void ButtonTurbo();
   void GetKeyBoardInput(GCPadStatus* PadStatus);
   void GetKeyBoardInput(u8* data, WiimoteEmu::ReportFeatures rptf, int ext, const wiimote_key key);
+  bool TASHasFocus();
   void CreateGCLayout();
   void CreateWiiLayout(int num);
+  wxBitmap CreateStickBitmap(int x, int y);
+  void SetWiiButtons(u16* butt);
+  void HandleExtensionChange();
 
 private:
-  enum : int
-  {
-    ID_C_STICK = 1001,
-    ID_MAIN_STICK = 1002,
-    ID_CC_L_STICK = 1003,
-    ID_CC_R_STICK = 1004
-  };
-
-  // Used in the context of creating controls on the fly
-  // This is greater than the last stick enum constant to
-  // prevent ID clashing in wx's event system.
+  const int ID_C_STICK = 1001;
+  const int ID_MAIN_STICK = 1002;
+  const int ID_CC_L_STICK = 1003;
+  const int ID_CC_R_STICK = 1004;
   int m_eleID = 1005;
 
   struct Control
   {
     wxTextCtrl* text;
-    DolphinSlider* slider;
+    wxSlider* slider;
     int value = -1;
     int text_id;
     int slider_id;
@@ -68,7 +73,6 @@ private:
   struct Button
   {
     wxCheckBox* checkbox;
-    bool is_checked = false;
     bool value = false;
     bool set_by_keyboard = false;
     bool turbo_on = false;
@@ -88,35 +92,20 @@ private:
   void SetButtonValue(Button* button, bool CurrentState);
   void SetSliderValue(Control* control, int CurrentValue);
   void CreateBaseLayout();
+
+  void ExecuteHelpers(); //Dragonbane
+
   void UpdateStickBitmap(Stick stick);
   void InvalidateButton(Button* button);
   void InvalidateControl(Control* button);
-  void InvalidateExtension();
   void UpdateFromInvalidatedButton(wxCommandEvent& event);
   void UpdateFromInvalidatedControl(wxCommandEvent& event);
-  void UpdateFromInvalidatedExtension(wxThreadEvent& event);
-  void OnCheckboxToggle(wxCommandEvent& event);
   Stick* FindStickByID(int id);
-  Stick CreateStick(int id_stick, int xRange, int yRange, u32 defaultX, u32 defaultY, bool reverseX,
-                    bool reverseY);
+  Stick CreateStick(int id_stick, int xRange, int yRange, u32 defaultX, u32 defaultY, bool reverseX, bool reverseY);
   wxStaticBoxSizer* CreateStickLayout(Stick* tempStick, const wxString& title);
   wxStaticBoxSizer* CreateAccelLayout(Control* x, Control* y, Control* z, const wxString& title);
-  Button CreateButton(const wxString& name);
-  Control CreateControl(long style, int width, int height, bool reverse = false, u32 range = 255,
-                        u32 default_value = 128);
-  wxBitmap CreateStickBitmap(int x, int y);
-
-  void OnCloseWindow(wxCloseEvent& event);
-  void UpdateFromSliders(wxCommandEvent& event);
-  void UpdateFromText(wxCommandEvent& event);
-  void OnMouseDownL(wxMouseEvent& event);
-  void OnMouseUpR(wxMouseEvent& event);
-  void OnRightClickSlider(wxMouseEvent& event);
-  void SetTurbo(wxMouseEvent& event);
-  void ButtonTurbo();
-  void HandleExtensionChange();
-  void ResetValues();
-  void SetWiiButtons(u16* butt);
+  Button CreateButton(const std::string& name);
+  Control CreateControl(long style, int width, int height, bool reverse = false, u32 range = 255, u32 default_value = 128);
 
   enum
   {
@@ -128,19 +117,26 @@ private:
     CC_R_TRIGGER,
   };
 
-  Control m_l_cont, m_r_cont, m_x_cont, m_y_cont, m_z_cont, m_nx_cont, m_ny_cont, m_nz_cont, m_cc_l,
-      m_cc_r;
+  Control m_l_cont, m_r_cont, m_x_cont, m_y_cont, m_z_cont, m_nx_cont, m_ny_cont, m_nz_cont, m_cc_l, m_cc_r;
   Button m_a, m_b, m_x, m_y, m_z, m_l, m_r, m_c;
   Button m_start, m_plus, m_minus, m_one, m_two, m_home;
   Button m_dpad_up, m_dpad_down, m_dpad_left, m_dpad_right;
   Stick m_main_stick, m_c_stick;
 
+  //Dragonbane, analog stuff by CGF
+
+  Button m_reset, m_quickspin, m_rollassist, m_skipDialog, m_analog_up, m_analog_down, m_analog_left, m_analog_right;
+
   Stick m_cc_l_stick, m_cc_r_stick;
 
-  std::array<Button*, 13> m_buttons;
-  std::array<Button, 15> m_cc_buttons;
-  std::array<Control*, 10> m_controls;
-  std::array<Control*, 6> m_cc_controls;
+  Button* m_buttons[24]; //Original: 13, DB: 18
+  Button m_cc_buttons[15];
+  Control* m_controls[10];
+  Control* m_cc_controls[6];
+  static const int m_gc_pad_buttons_bitmask[12];
+  static const int m_wii_buttons_bitmask[11];
+  static const int m_cc_buttons_bitmask[15];
+  static const std::string m_cc_button_names[15];
   u8 m_ext = 0;
   wxBoxSizer* m_main_szr;
   wxBoxSizer* m_wiimote_szr;
@@ -152,6 +148,21 @@ private:
   wxStaticBoxSizer* m_cc_r_stick_szr;
 
   bool m_has_layout = false;
+
+  //Dragonbane, CGF
+  int quickspin_timer = 0;
+  bool quickspin_enabled = false;
+
+  bool auto_dialog = false;
+  int dialog_timer = 0;
+
+  bool analog_stick_up = false;
+
+  bool analog_stick_down = false;
+
+  bool analog_stick_left = false;
+
+  bool analog_stick_right = false;
 
   wxGridSizer* m_buttons_dpad;
 };

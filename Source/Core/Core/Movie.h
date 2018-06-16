@@ -63,6 +63,12 @@ extern u8 tunerActionID;
 extern u8 tunerExecuteID;
 extern u8 tunerStatus;
 
+//Dragonbane: Auto Roll Stuff
+extern int roll_timer;
+extern bool roll_enabled;
+extern bool first_roll;
+extern bool checkSave, uncheckSave;
+
 // When making changes to the DTM format, keep in mind that there are programs other
 // than Dolphin that parse DTM files. The format is expected to be relatively stable.
 #pragma pack(push, 1)

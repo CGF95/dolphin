@@ -34,6 +34,7 @@ private:
   wxMenu* CreateMovieMenu() const;
   wxMenu* CreateOptionsMenu() const;
   wxMenu* CreateToolsMenu() const;
+  wxMenu* CreateZeldaEditionMenu() const;
   wxMenu* CreateViewMenu() const;
   wxMenu* CreateJITMenu() const;
   wxMenu* CreateDebugMenu();

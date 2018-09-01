@@ -48,15 +48,16 @@ struct ControllerState
   bool disc : 1;          // Checks for disc being changed
   bool reset : 1;         // Console reset button
   bool is_connected : 1;  // Should controller be treated as connected
+  bool loading : 1;                        // Dragonbane: Loading status flag, 1 bit
+  bool reserved : 1;                       // Reserved bits used for padding, 1 bit
 
   u8 tunerEvent;		  // Dragonbane: Tuner Events, 8 bits
-  float LinkX, LinkZ;	  // Dragonbane: Used to detect desyncs, 64 bits
 
   u8 TriggerL, TriggerR;          // Triggers, 16 bits
   u8 AnalogStickX, AnalogStickY;  // Main Stick, 16 bits
   u8 CStickX, CStickY;            // Sub-Stick, 16 bits
 };
-static_assert(sizeof(ControllerState) == 17, "ControllerState should be 17 bytes");
+static_assert(sizeof(ControllerState) == 10, "ControllerState should be 17 bytes");
 #pragma pack(pop)
 
 extern u8 tunerActionID;

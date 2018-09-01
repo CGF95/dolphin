@@ -1283,6 +1283,7 @@ void ReadHeader()
     s_bClearSave = tmpHeader.bClearSave;
     s_memcards = tmpHeader.memcards;
     s_bongos = tmpHeader.bongos;
+    s_numGBAs = tmpHeader.numGBAs; //Dragonbane
     s_bNetPlay = tmpHeader.bNetPlay;
     s_revision = tmpHeader.revision;
   }

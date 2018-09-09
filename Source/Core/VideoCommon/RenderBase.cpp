@@ -40,6 +40,7 @@
 #include "Core/FifoPlayer/FifoRecorder.h"
 #include "Core/HW/VideoInterface.h"
 #include "Core/Host.h"
+#include "Core/HW/Memmap.h" //CGF
 #include "Core/Movie.h"
 
 #include "VideoCommon/AVIDump.h"
@@ -65,6 +66,7 @@
 #include "VideoCommon/VertexShaderManager.h"
 #include "VideoCommon/VideoConfig.h"
 #include "VideoCommon/XFMemory.h"
+#include "DolphinWX/ZeldaEdition/TWWTunerInput.h"
 
 // TODO: Move these out of here.
 int frameCount;
@@ -265,7 +267,7 @@ void Renderer::DrawDebugText()
       final_cyan += StringFromFormat("Frame: %" PRIu64, Movie::GetCurrentFrame());
       if (Movie::IsPlayingInput())
         final_cyan += StringFromFormat("\nInput: %" PRIu64 " / %" PRIu64,
-                                       Movie::GetCurrentInputCount(), Movie::GetTotalInputCount());
+          Movie::GetCurrentInputCount(), Movie::GetTotalInputCount());
     }
 
     final_cyan += "\n";
@@ -384,6 +386,73 @@ void Renderer::DrawDebugText()
   // and then the text
   RenderText(final_cyan, 20, 20, 0xFF00FFFF);
   RenderText(final_yellow, 20, 20, 0xFFFFFF00);
+
+  //Dragonbane: Recording Notice
+  if (Movie::IsRecordingInput())
+  {
+    g_renderer->RenderText("Recording", 20, 0, 0xFFFF00FF);
+  }
+  else if (Movie::IsPlayingInput())
+  {
+    g_renderer->RenderText("Playback", 20, 0, 0xFF00FF00);
+  }
+
+  if (Movie::IsRecordingInput())
+  {
+    g_renderer->RenderText("Recording", 20, 0, 0xFFFF00FF);
+  }
+
+
+  std::string gameID = SConfig::GetInstance().GetGameID();
+  if (!gameID.compare("GZLJ01"))
+  {
+    std::string tunerInfo = "Tuner Status: ";
+
+    if (Movie::tunerStatus == 0)
+      tunerInfo.append("Disabled");
+    else if (Movie::tunerStatus == 1)
+      tunerInfo.append("Standby");
+    else if (Movie::tunerStatus == 2)
+      tunerInfo.append("Ready");
+    else if (Movie::tunerStatus == 3)
+      tunerInfo.append("Connecting");
+    else if (Movie::tunerStatus == 4)
+      tunerInfo.append("Calling");
+    else if (Movie::tunerStatus == 5)
+      tunerInfo.append("Connected");
+    else
+      tunerInfo.append("N/A");
+
+    g_renderer->RenderText(tunerInfo, 200, 0, 0xFFFFFF00);
+
+  //TODO: Make Tuner Action Info more accurate
+  std::string TWWgameID = SConfig::GetInstance().GetGameID();
+  if (!TWWgameID.compare("GZLJ01"))
+  {
+    std::string tunerActionInfo = "Tuner Action: ";
+    if (TWWgameID.compare("GZLJ01"))
+      tunerActionInfo.append("");
+    else if (Movie::tunerExecuteID == 1) //Up
+      tunerActionInfo.append("UP");
+    else if (Movie::tunerExecuteID == 2) //Up-Right
+      tunerActionInfo.append("UP-RIGHT");
+    else if (Movie::tunerExecuteID == 3) //Right
+      tunerActionInfo.append("RIGHT");
+    else if (Movie::tunerExecuteID == 4) //Down-Right
+      tunerActionInfo.append("DOWN-RIGHT");
+    else if (Movie::tunerExecuteID == 5) //Down
+      tunerActionInfo.append("DOWN");
+    else if (Movie::tunerExecuteID == 6) //Down-Left
+      tunerActionInfo.append("DOWN-LEFT");
+    else if (Movie::tunerExecuteID == 7) //Left
+      tunerActionInfo.append("LEFT");
+    else if (Movie::tunerExecuteID == 8) //Up-Left
+      tunerActionInfo.append("UP-LEFT");
+    else
+      tunerActionInfo.append(""); //Unknown / None
+    g_renderer->RenderText(tunerActionInfo, 200, 20, 0xFFFFFF00);
+    }
+  }
 }
 
 float Renderer::CalculateDrawAspectRatio() const

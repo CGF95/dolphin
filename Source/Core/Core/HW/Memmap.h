@@ -79,12 +79,17 @@ u8 Read_U8(u32 address);
 u16 Read_U16(u32 address);
 u32 Read_U32(u32 address);
 u64 Read_U64(u32 address);
+std::string Read_String(const u32 startAddress, int count);
 void Write_U8(u8 var, u32 address);
 void Write_U16(u16 var, u32 address);
 void Write_U32(u32 var, u32 address);
 void Write_U64(u64 var, u32 address);
 void Write_U32_Swap(u32 var, u32 address);
 void Write_U64_Swap(u64 var, u32 address);
+
+// Useful helper functions, used by ARM JIT
+float Read_F32(const u32 address);
+double Read_F64(const u32 address);
 
 // Templated functions for byteswapped copies.
 template <typename T>

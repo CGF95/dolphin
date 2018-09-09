@@ -16,51 +16,59 @@
 
 namespace SerialInterface
 {
-void GBAConnectionWaiter_Shutdown();
 
-class GBASockServer
-{
-public:
-  GBASockServer();
-  ~GBASockServer();
+	u8 GetNumConnected();
+	int GetTransferTime(u8 cmd);
+	void GBAConnectionWaiter_Shutdown();
 
-  bool Connect();
-  bool IsConnected();
-  void ClockSync();
-  void Send(const u8* si_buffer);
-  int Receive(u8* si_buffer);
+	class GBASockServer
+	{
+	public:
+		GBASockServer(int device_number);
+		~GBASockServer();
 
-private:
-  void Disconnect();
+		void Disconnect();
 
-  std::unique_ptr<sf::TcpSocket> m_client;
-  std::unique_ptr<sf::TcpSocket> m_clock_sync;
+		void ClockSync();
 
-  u64 m_last_time_slice = 0;
-  bool m_booted = false;
-};
+		void Send(u8* si_buffer);
+		int Receive(u8* si_buffer);
 
-class CSIDevice_GBA : public ISIDevice
-{
-public:
-  CSIDevice_GBA(SIDevices device, int device_number);
+		//Dragonbane: Fake GBA
+		int CreateFakeResponse(u8* si_buffer);
 
-  int RunBuffer(u8* buffer, int length) override;
-  int TransferInterval() override;
-  bool GetData(u32& hi, u32& low) override;
-  void SendCommand(u32 command, u8 poll) override;
+	private:
+		std::unique_ptr<sf::TcpSocket> client;
+		std::unique_ptr<sf::TcpSocket> clock_sync;
+		unsigned char send_data[5];
+		unsigned char recv_data[5];
 
-private:
-  enum class NextAction
-  {
-    SendCommand,
-    WaitTransferTime,
-    ReceiveResponse
-  };
+		u64 time_cmd_sent;
+		u64 last_time_slice;
+		u8 device_number;
+		u8 cmd;
+		bool booted;
+	};
 
-  GBASockServer m_sock_server;
-  NextAction m_next_action = NextAction::SendCommand;
-  u8 m_last_cmd;
-  u64 m_timestamp_sent = 0;
-};
+	class CSIDevice_GBA : public ISIDevice, private GBASockServer
+	{
+	public:
+		CSIDevice_GBA(SIDevices device, int device_number);
+		~CSIDevice_GBA();
+
+		virtual int RunBuffer(u8* buffer, int length) override;
+		virtual int TransferInterval() override;
+
+		virtual bool GetData(u32& hi, u32& low) override { return false; }
+		virtual void SendCommand(u32 _cmd, u8 poll) override {}
+
+		//Dragonbane: Savestate support
+		virtual void DoState(PointerWrap& p) override;
+
+	private:
+		u8 send_data[5];
+		int num_data_received;
+		u64 timestamp_sent;
+		bool waiting_for_response;
+	};
 }  // namespace SerialInterface

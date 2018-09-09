@@ -74,7 +74,7 @@ function GetFileContents(f)
 // get info from git
 var gitexe = GetGitExe();
 var revision	= GetFirstStdOutLine(gitexe + cmd_revision);
-var describe	= "5.0 [Zelda Edition Dev]";
+var describe	= "5.0";
 var branch		= GetFirstStdOutLine(gitexe + cmd_branch);
 var isStable = +("master" == branch || "stable" == branch);
 

@@ -324,15 +324,11 @@
     <ClCompile Include="Debugger\JITWidget.cpp" />
     <ClCompile Include="Debugger\MemoryWidget.cpp" />
     <ClCompile Include="Debugger\MemoryViewWidget.cpp" />
-<<<<<<< HEAD:Source/Core/DolphinQt/DolphinQt.vcxproj
     <ClCompile Include="DiscordHandler.cpp" />
     <ClCompile Include="DiscordJoinRequestDialog.cpp" />
     <ClCompile Include="FIFO\FIFOAnalyzer.cpp" />
     <ClCompile Include="FIFO\FIFOPlayerWindow.cpp" />
-=======
-    <ClCompile Include="FIFOPlayerWindow.cpp" />
-    <ClCompile Include="QtTunerInput.cpp" />
->>>>>>> zelda-edition-dev:Source/Core/DolphinQt2/DolphinQt2.vcxproj
+    <ClCompile Include="GCTingleTunerInput.cpp" />
     <ClCompile Include="QtUtils\WinIconHelper.cpp" />
     <ClCompile Include="TAS\GCTASInputWindow.cpp" />
     <ClCompile Include="TAS\WiiTASInputWindow.cpp" />
@@ -397,7 +393,9 @@
     <ClInclude Include="QtUtils\RunOnObject.h" />
     <ClInclude Include="QtUtils\WinIconHelper.h" />
     <ClInclude Include="Resources.h" />
+    <ClInclude Include="TAS\GCTingleTunerInput.h" />
     <ClInclude Include="Translation.h" />
+    <ClInclude Include="TunerWindow.h" />
     <ClInclude Include="WiiUpdate.h" />
   </ItemGroup>
   <ItemGroup>

@@ -66,7 +66,7 @@
 #include "VideoCommon/VertexShaderManager.h"
 #include "VideoCommon/VideoConfig.h"
 #include "VideoCommon/XFMemory.h"
-#include "DolphinWX/ZeldaEdition/TWWTunerInput.h"
+#include "DolphinQt/TAS/GCTASInputWindow.h"
 
 // TODO: Move these out of here.
 int frameCount;
@@ -424,34 +424,6 @@ void Renderer::DrawDebugText()
       tunerInfo.append("N/A");
 
     g_renderer->RenderText(tunerInfo, 200, 0, 0xFFFFFF00);
-
-  //TODO: Make Tuner Action Info more accurate
-  std::string TWWgameID = SConfig::GetInstance().GetGameID();
-  if (!TWWgameID.compare("GZLJ01"))
-  {
-    std::string tunerActionInfo = "Tuner Action: ";
-    if (TWWgameID.compare("GZLJ01"))
-      tunerActionInfo.append("");
-    else if (Movie::tunerExecuteID == 1) //Up
-      tunerActionInfo.append("UP");
-    else if (Movie::tunerExecuteID == 2) //Up-Right
-      tunerActionInfo.append("UP-RIGHT");
-    else if (Movie::tunerExecuteID == 3) //Right
-      tunerActionInfo.append("RIGHT");
-    else if (Movie::tunerExecuteID == 4) //Down-Right
-      tunerActionInfo.append("DOWN-RIGHT");
-    else if (Movie::tunerExecuteID == 5) //Down
-      tunerActionInfo.append("DOWN");
-    else if (Movie::tunerExecuteID == 6) //Down-Left
-      tunerActionInfo.append("DOWN-LEFT");
-    else if (Movie::tunerExecuteID == 7) //Left
-      tunerActionInfo.append("LEFT");
-    else if (Movie::tunerExecuteID == 8) //Up-Left
-      tunerActionInfo.append("UP-LEFT");
-    else
-      tunerActionInfo.append(""); //Unknown / None
-    g_renderer->RenderText(tunerActionInfo, 200, 20, 0xFFFFFF00);
-    }
   }
 }
 

@@ -12,7 +12,7 @@
 #include "Common/CommonTypes.h"
 
 //Dragonbane
-#include "DolphinWX/Main.h"
+//#include "DolphinWX/Main.h"
 
 struct BootParameters;
 

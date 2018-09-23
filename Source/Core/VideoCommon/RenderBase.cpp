@@ -66,7 +66,7 @@
 #include "VideoCommon/VertexShaderManager.h"
 #include "VideoCommon/VideoConfig.h"
 #include "VideoCommon/XFMemory.h"
-#include "DolphinQt/TAS/GCTASInputWindow.h"
+//#include "DolphinQt/TAS/GCTASInputWindow.h"
 
 // TODO: Move these out of here.
 int frameCount;
@@ -390,18 +390,12 @@ void Renderer::DrawDebugText()
   //Dragonbane: Recording Notice
   if (Movie::IsRecordingInput())
   {
-    g_renderer->RenderText("Recording", 20, 0, 0xFFFF00FF);
+    g_renderer->RenderText("RECORDING", 20, 0, 0xFFFF00FF);
   }
   else if (Movie::IsPlayingInput())
   {
-    g_renderer->RenderText("Playback", 20, 0, 0xFF00FF00);
+    g_renderer->RenderText("PLAYBACK", 20, 0, 0xFF00FF00);
   }
-
-  if (Movie::IsRecordingInput())
-  {
-    g_renderer->RenderText("Recording", 20, 0, 0xFFFF00FF);
-  }
-
 
   std::string gameID = SConfig::GetInstance().GetGameID();
   if (!gameID.compare("GZLJ01"))

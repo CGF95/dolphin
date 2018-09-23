@@ -118,6 +118,7 @@ add_executable(dolphin-emu
   TAS/GCTASInputWindow.cpp
   TAS/WiiTASInputWindow.cpp
   TAS/TASInputWindow.cpp
+  TAS/TunerInput.cpp
   TAS/StickWidget.cpp
   TAS/IRWidget.cpp
   Updater.cpp

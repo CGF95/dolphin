@@ -35,3 +35,7 @@ CMakeLists.txt.user
 # Ignore IDEA/Clion files/dirs
 /.idea/
 /Source/Core/DolphinWX
+Externals/picojson/picojson.log
+Externals/ed25519/ed25519.log
+/Source/TunerInput/TunerInput.ui
+/Source/TunerInput/TunerInput.qrc

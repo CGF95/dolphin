@@ -52,6 +52,8 @@
 
 #include "UICommon/GameFile.h"
 
+#include "TAS/TunerInput.h" //CGF
+
 MenuBar::MenuBar(QWidget* parent) : QMenuBar(parent)
 {
   AddFileMenu();
@@ -670,6 +672,8 @@ void MenuBar::AddMovieMenu()
   connect(m_recording_read_only, &QAction::toggled, [](bool value) { Movie::SetReadOnly(value); });
 
   movie_menu->addAction(tr("TAS Input"), this, [this] { emit ShowTASInput(); });
+
+  movie_menu->addAction(tr("Tuner Input"), this, [this] { emit ShowTunerInput(); });
 
   movie_menu->addSeparator();
 

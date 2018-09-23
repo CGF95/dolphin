@@ -11,8 +11,8 @@
 #include <QVBoxLayout>
 
 #include "Common/CommonTypes.h"
-
 #include "InputCommon/GCPadStatus.h"
+#include "Core/Movie.h"
 
 GCTASInputWindow::GCTASInputWindow(QWidget* parent, int num) : TASInputWindow(parent)
 {
@@ -51,6 +51,7 @@ GCTASInputWindow::GCTASInputWindow(QWidget* parent, int num) : TASInputWindow(pa
   m_up_button = new QCheckBox(QStringLiteral("&Up"));
   m_down_button = new QCheckBox(QStringLiteral("&Down"));
   m_right_button = new QCheckBox(QStringLiteral("R&ight"));
+  m_quickspin = new QCheckBox(QStringLiteral("Q&uickspin"));
 
   auto* buttons_layout1 = new QHBoxLayout;
   buttons_layout1->addWidget(m_a_button);
@@ -68,12 +69,16 @@ GCTASInputWindow::GCTASInputWindow(QWidget* parent, int num) : TASInputWindow(pa
   buttons_layout2->addWidget(m_down_button);
   buttons_layout2->addWidget(m_right_button);
 
+  auto* buttons_layout3 = new QHBoxLayout;
+  buttons_layout3->addWidget(m_quickspin);
+
   auto* buttons_layout = new QVBoxLayout;
   buttons_layout->setSizeConstraint(QLayout::SetFixedSize);
   buttons_layout->addLayout(buttons_layout1);
   buttons_layout->addLayout(buttons_layout2);
+  buttons_layout->addLayout(buttons_layout3);
 
-  m_buttons_box = new QGroupBox(tr("Buttons"));
+  m_buttons_box = new QGroupBox(tr("Buttons / Extras"));
   m_buttons_box->setLayout(buttons_layout);
 
   auto* layout = new QVBoxLayout;
@@ -81,7 +86,6 @@ GCTASInputWindow::GCTASInputWindow(QWidget* parent, int num) : TASInputWindow(pa
   layout->addWidget(m_triggers_box);
   layout->addWidget(m_buttons_box);
   layout->addWidget(m_use_controller);
-
   setLayout(layout);
 }
 
@@ -89,6 +93,9 @@ void GCTASInputWindow::GetValues(GCPadStatus* pad)
 {
   if (!isVisible())
     return;
+
+  int quickspin_timer = Movie::GetCurrentFrame();
+  bool quickspin_enabled = true;
 
   GetButton<u16>(m_a_button, pad->button, PAD_BUTTON_A);
   GetButton<u16>(m_b_button, pad->button, PAD_BUTTON_B);
@@ -113,6 +120,48 @@ void GCTASInputWindow::GetValues(GCPadStatus* pad)
   else
     pad->analogB = 0x00;
 
+  if (m_quickspin->isChecked())
+  {
+    m_x_main_stick_value, pad->stickX == 0x80;
+    m_y_main_stick_value, pad->stickY == 0x80;
+  }
+  else if (quickspin_enabled)
+  {
+    if (Movie::GetCurrentFrame() == quickspin_timer + 1)
+    {
+      m_x_main_stick_value, pad->stickX == 208;
+      m_y_main_stick_value, pad->stickY == 81;
+    }
+    else if (Movie::GetCurrentFrame() == quickspin_timer + 2)
+    {
+      m_x_main_stick_value, pad->stickX == 122;
+      m_y_main_stick_value, pad->stickY == 31;
+    }
+    else if (Movie::GetCurrentFrame() == quickspin_timer + 3)
+    {
+      m_x_main_stick_value, pad->stickX == 50;
+      m_y_main_stick_value, pad->stickY == 89;
+    }
+    else if (Movie::GetCurrentFrame() == quickspin_timer + 4)
+    {
+      m_x_main_stick_value, pad->stickX == 76;
+      m_y_main_stick_value, pad->stickY == 193;
+    }
+    else if (Movie::GetCurrentFrame() == quickspin_timer + 5)
+    {
+      m_x_main_stick_value, pad->stickX == 198;
+      m_y_main_stick_value, pad->stickY == 185;
+      m_b_button->isChecked();
+    }
+    else if (Movie::GetCurrentFrame() == quickspin_timer + 6)
+    {
+      m_x_main_stick_value, pad->stickX == 128;
+      m_y_main_stick_value, pad->stickY == 128;
+      m_b_button->checkState() == false;
+
+     quickspin_enabled = false;
+    }
+  }
   GetSpinBoxU8(m_l_trigger_value, pad->triggerLeft);
   GetSpinBoxU8(m_r_trigger_value, pad->triggerRight);
 

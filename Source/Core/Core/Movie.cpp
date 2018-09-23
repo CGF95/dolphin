@@ -170,13 +170,13 @@ std::string GetInputDisplay()
     }
   }
 
-  std::string input_display;
+  std::string inputDisplay;
   {
     std::lock_guard<std::mutex> guard(s_input_display_lock);
     for (int i = 0; i < 8; ++i)
     {
       if ((s_controllers & (1 << i)) != 0)
-        input_display += s_InputDisplay[i] + '\n';
+        inputDisplay += s_InputDisplay[i] + '\n';
     }
     //Dragonbane
     std::string gameID = SConfig::GetInstance().GetGameID();
@@ -188,7 +188,7 @@ std::string GetInputDisplay()
     {
       int lineCounter = 0;
       bool inProgress = true;
-      input_display.append("\n");
+      inputDisplay.append("\n");
 
       while (inProgress)
       {
@@ -289,7 +289,7 @@ std::string GetInputDisplay()
             }
             else
             {
-              input_display.append(currSectionOutput + "N/A");
+              inputDisplay.append(currSectionOutput + "N/A");
               locNext = subLine.find("%", 0);
               continue;
             }
@@ -390,12 +390,12 @@ std::string GetInputDisplay()
 
           std::string completeOutput = StringFromFormat("%s%s", currSectionOutput.c_str(), finalOutput.c_str());
 
-          input_display.append(completeOutput);
+          inputDisplay.append(completeOutput);
 
           locNext = subLine.find("%", 0);
         }
 
-        input_display.append("\n");
+        inputDisplay.append("\n");
       }
 
     }
@@ -578,11 +578,9 @@ std::string GetInputDisplay()
     inputDisplay.append(strMisc);
     }
     */
-
+  return inputDisplay;
   }
-  return input_display;
 }
-
 // NOTE: GPU Thread
 std::string GetRTCDisplay()
 {
@@ -1369,13 +1367,9 @@ void DoState(PointerWrap& p)
   p.Do(s_currentInputCount);
   p.Do(s_bPolled);
   p.Do(s_tickCountAtLastInput);
-
-  if (!p.GetMode() == PointerWrap::MODE_READ)
-  {
     //Dragonbane: Tuner Stuff
     p.Do(tunerExecuteID); //Save current Tuner Action ID
     p.Do(tunerStatus); //Save Tuner Status for Display
-  }
 
   // other variables (such as s_totalBytes and s_totalFrames) are set in LoadInput
 }

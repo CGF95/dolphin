@@ -31,6 +31,7 @@ private:
   QCheckBox* m_up_button;
   QCheckBox* m_down_button;
   QCheckBox* m_right_button;
+  QCheckBox* m_quickspin;
   QSpinBox* m_l_trigger_value;
   QSpinBox* m_r_trigger_value;
   QSpinBox* m_x_main_stick_value;

@@ -51,7 +51,7 @@ TunerInput::TunerInput(QWidget* parent)
 void TunerInput::OnExecuteEvents()
 {
   QMessageBox msgBox;
-  if (isEnabled())
+  if (isVisible())
   {
     if (!Core::IsRunningAndStarted())
     {

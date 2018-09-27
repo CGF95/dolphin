@@ -21,7 +21,6 @@ class TASInputWindow : public QDialog
   Q_OBJECT
 public:
   explicit TASInputWindow(QWidget* parent);
-
 protected:
   QGroupBox* CreateStickInputs(QString name, QSpinBox*& x_value, QSpinBox*& y_value, u16 max_x,
                                u16 max_y, Qt::Key x_shortcut_key, Qt::Key y_shortcut_key);

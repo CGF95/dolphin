@@ -18,20 +18,34 @@ public:
   explicit GCTASInputWindow(QWidget* parent, int num);
   void GetValues(GCPadStatus* pad);
 
+  void ExecuteHelpers(GCPadStatus* pad);
+
 private:
-  QCheckBox* m_a_button;
-  QCheckBox* m_b_button;
-  QCheckBox* m_x_button;
-  QCheckBox* m_y_button;
-  QCheckBox* m_z_button;
-  QCheckBox* m_l_button;
-  QCheckBox* m_r_button;
-  QCheckBox* m_start_button;
-  QCheckBox* m_left_button;
-  QCheckBox* m_up_button;
-  QCheckBox* m_down_button;
-  QCheckBox* m_right_button;
-  QCheckBox* m_quickspin;
+
+  // Dragonbane
+  int quickspin_timer = 0;
+  bool quickspin_enabled = false;
+
+  int dialog_timer = 0;
+  bool auto_dialog = false;
+
+  int analog_timer_ud = 0;
+  bool auto_analog_ud = false;
+
+  int analog_timer_lr = 0;
+  bool auto_analog_lr = false;
+
+  struct Button //TODO
+  { 
+    QCheckBox* checkbox;
+    bool turbo_on = false;
+    bool value = false;
+  };
+
+  Button* m_buttons[16];
+  Button m_a_button, m_b_button, m_x_button, m_y_button, m_z_button, m_l_button, m_r_button;
+  Button m_start_button, m_left_button, m_up_button, m_down_button, m_right_button, m_analog_lr, m_analog_ud;
+  Button m_skipDialog, m_rollassist;
   QSpinBox* m_l_trigger_value;
   QSpinBox* m_r_trigger_value;
   QSpinBox* m_x_main_stick_value;

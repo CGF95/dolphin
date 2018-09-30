@@ -57,6 +57,7 @@ GCTASInputWindow::GCTASInputWindow(QWidget* parent, int num) : TASInputWindow(pa
   m_buttons[13] = &m_analog_lr;
   m_buttons[14] = &m_analog_ud;
   m_buttons[15] = &m_rollassist;
+  m_buttons[16] = &m_hoverassist;
 
   m_buttons[0]->checkbox = new QCheckBox(QStringLiteral("&A"));
   m_buttons[1]->checkbox = new QCheckBox(QStringLiteral("&B"));
@@ -74,6 +75,7 @@ GCTASInputWindow::GCTASInputWindow(QWidget* parent, int num) : TASInputWindow(pa
   m_buttons[13]->checkbox = new QCheckBox(QStringLiteral("&Swim X"));
   m_buttons[14]->checkbox = new QCheckBox(QStringLiteral("&Swim Y"));
   m_buttons[15]->checkbox = new QCheckBox(QStringLiteral("&Roll Assist"));
+  m_buttons[16]->checkbox = new QCheckBox(QStringLiteral("&Hover Assist"));
 
   auto* buttons_layout1 = new QHBoxLayout;
   buttons_layout1->addWidget(m_buttons[0]->checkbox);
@@ -96,6 +98,7 @@ GCTASInputWindow::GCTASInputWindow(QWidget* parent, int num) : TASInputWindow(pa
   buttons_layout3->addWidget(m_buttons[13]->checkbox);
   buttons_layout3->addWidget(m_buttons[14]->checkbox);
   buttons_layout3->addWidget(m_buttons[15]->checkbox);
+  buttons_layout3->addWidget(m_buttons[16]->checkbox);
 
   auto* buttons_layout = new QVBoxLayout;
   buttons_layout->setSizeConstraint(QLayout::SetFixedSize);
@@ -166,7 +169,7 @@ void GCTASInputWindow::GetValues(GCPadStatus* pad)
 }
 
 
-//TODO: Finish
+//TODO: Merge when turbo becomes available, because I'm bad to do it myself 4Head
 void GCTASInputWindow::ExecuteHelpers(GCPadStatus* pad)
 {
   if (!Core::IsRunningAndStarted())
@@ -261,6 +264,30 @@ void GCTASInputWindow::ExecuteHelpers(GCPadStatus* pad)
   {
     auto_analog_ud = false;
     pad->stickY = 0x7f;
+  }
+
+  if (m_hoverassist.checkbox->isChecked())
+  {
+    if (!auto_hover)
+    {
+      hover_timer = Movie::GetCurrentFrame();
+      auto_hover = true;
+    }
+
+    if (hover_timer + 2 == Movie::GetCurrentFrame())
+    {
+      hover_timer = Movie::GetCurrentFrame();
+    }
+
+    if (hover_timer + 1 == Movie::GetCurrentFrame())
+    {
+      pad->analogB = 0xFF;
+    }
+
+    if (hover_timer == Movie::GetCurrentFrame())
+    {
+      pad->analogB = 0x00;
+    }
   }
 
   if (m_rollassist.checkbox->isChecked())

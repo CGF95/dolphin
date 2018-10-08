@@ -329,6 +329,5 @@ void GCTASInputWindow::ExecuteHelpers(GCPadStatus* pad)
   {
     Movie::first_roll = false;
     Movie::roll_timer = Movie::GetCurrentFrame() + 1;
-    m_a_button.checkbox->setChecked(false);
   }
 }

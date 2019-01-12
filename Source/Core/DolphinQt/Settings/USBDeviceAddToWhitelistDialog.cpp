@@ -124,9 +124,10 @@ void USBDeviceAddToWhitelistDialog::AddUSBDeviceToWhitelist()
   if (!IsValidUSBIDString(vid_string))
   {
     // i18n: Here, VID means Vendor ID (for a USB device).
-    QMessageBox vid_warning_box;
+    QMessageBox vid_warning_box(this);
     vid_warning_box.setIcon(QMessageBox::Warning);
     vid_warning_box.setWindowTitle(tr("USB Whitelist Error"));
+    // i18n: Here, VID means Vendor ID (for a USB device).
     vid_warning_box.setText(tr("The entered VID is invalid."));
     vid_warning_box.setStandardButtons(QMessageBox::Ok);
     vid_warning_box.exec();
@@ -135,9 +136,10 @@ void USBDeviceAddToWhitelistDialog::AddUSBDeviceToWhitelist()
   if (!IsValidUSBIDString(pid_string))
   {
     // i18n: Here, PID means Product ID (for a USB device).
-    QMessageBox pid_warning_box;
+    QMessageBox pid_warning_box(this);
     pid_warning_box.setIcon(QMessageBox::Warning);
     pid_warning_box.setWindowTitle(tr("USB Whitelist Error"));
+    // i18n: Here, PID means Product ID (for a USB device).
     pid_warning_box.setText(tr("The entered PID is invalid."));
     pid_warning_box.setStandardButtons(QMessageBox::Ok);
     pid_warning_box.exec();

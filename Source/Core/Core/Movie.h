@@ -57,7 +57,7 @@ struct ControllerState
   u8 AnalogStickX, AnalogStickY;  // Main Stick, 16 bits
   u8 CStickX, CStickY;            // Sub-Stick, 16 bits
 };
-static_assert(sizeof(ControllerState) == 10, "ControllerState should be 17 bytes");
+static_assert(sizeof(ControllerState) == 10, "ControllerState should be 10 bytes");
 #pragma pack(pop)
 
 extern u8 tunerActionID;

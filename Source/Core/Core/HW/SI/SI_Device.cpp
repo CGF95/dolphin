@@ -47,7 +47,7 @@ int ISIDevice::RunBuffer(u8* buffer, int length)
 
   while (num < length)
   {
-    temp += StringFromFormat("0x%02x ", buffer[num]);
+    temp += StringFromFormat("0x%02x ", buffer[num ^ 3]);
     num++;
 
     if ((num % 8) == 0)

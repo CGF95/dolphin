@@ -3,7 +3,6 @@
 // Refer to the license.txt file included.
 
 #include "Core/HW/SI/SI_DeviceNull.h"
-#include "Common/Swap.h"
 
 #include <cstring>
 
@@ -16,7 +15,7 @@ CSIDevice_Null::CSIDevice_Null(SIDevices device, int device_number)
 
 int CSIDevice_Null::RunBuffer(u8* buffer, int length)
 {
-  u32 reply = Common::swap32(SI_ERROR_NO_RESPONSE);
+  constexpr u32 reply = SI_ERROR_NO_RESPONSE;
   std::memcpy(buffer, &reply, sizeof(reply));
   return 4;
 }

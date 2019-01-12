@@ -6,6 +6,7 @@
 #include <qtimer.h>
 
 #include "DiscIO/Enums.h"
+#include "Common/File.h"
 
 TunerInput::TunerInput(QWidget* parent)
 {

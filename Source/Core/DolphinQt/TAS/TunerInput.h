@@ -86,8 +86,6 @@ public:
     m_buttons = new QButtonGroup(TunerInputDialog);
     m_buttons->setObjectName(QStringLiteral("m_buttons"));
     m_buttons->setExclusive(false);
-    ResetCursor = new QPushButton(widget);
-    ResetCursor->setObjectName(QStringLiteral("ResetCursor"));
 
     gridLayout->addWidget(ResetCursor, 1, 1, 1, 1);
 
@@ -113,6 +111,11 @@ public:
     m_buttons->addButton(m_dpad_down);
     m_dpad_down->setObjectName(QStringLiteral("m_dpad_down"));
     gridLayout->addWidget(m_dpad_down, 2, 1, 1, 1);
+
+    ResetCursor = new QPushButton(groupBox);
+    ResetCursor->setObjectName(QStringLiteral("ResetCursor"));
+    ResetCursor->setGeometry(QRect(20, 80, 101, 21));
+
 
     groupBox->raise();
     m_dpad_right->raise();

@@ -10,3 +10,5 @@ Windows, Linux, OS X, and recent Android devices. It's licensed under
 the terms of the GNU General Public License, version 2 (GPLv2).
 
 Please read the [FAQ](https://dolphin-emu.org/docs/faq/) before using Dolphin.
+
+This software comes as is, so bugs are expected, especially with my own hacky version of Dolphin.

@@ -25,6 +25,7 @@ class DragEnterEvent;
 class FIFOPlayerWindow;
 class GameList;
 class GCTASInputWindow;
+class TunerInput;
 class GraphicsWindow;
 class HotkeyScheduler;
 class JITWidget;
@@ -173,6 +174,7 @@ private:
   void OnActivateChat();
   void OnRequestGolfControl();
   void ShowTASInput();
+  void ShowTunerInput();
 
   void ChangeDisc();
   void EjectDisc();
@@ -214,6 +216,7 @@ private:
   NetPlayDialog* m_netplay_dialog;
   DiscordHandler* m_netplay_discord;
   NetPlaySetupDialog* m_netplay_setup_dialog;
+  TunerInput* m_tuner_window;
   static constexpr int num_gc_controllers = 4;
   std::array<GCTASInputWindow*, num_gc_controllers> m_gc_tas_input_windows{};
   static constexpr int num_wii_controllers = 4;

@@ -34,5 +34,13 @@ CMakeLists.txt.user
 *.kdev4
 # Ignore IDEA/Clion files/dirs
 /.idea/
+<<<<<<< HEAD
 # Ignore Visual Studio Code's working dir
 /.vscode/
+=======
+/Source/Core/DolphinWX
+Externals/picojson/picojson.log
+Externals/ed25519/ed25519.log
+/Source/TunerInput/TunerInput.ui
+/Source/TunerInput/TunerInput.qrc
+>>>>>>> Qt-stuff

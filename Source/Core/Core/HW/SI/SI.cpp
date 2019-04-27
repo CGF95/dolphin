@@ -12,13 +12,13 @@
 
 #include "Common/ChunkFile.h"
 #include "Common/CommonTypes.h"
-#include "Common/Swap.h"
 #include "Core/ConfigManager.h"
 #include "Core/CoreTiming.h"
 #include "Core/HW/MMIO.h"
 #include "Core/HW/ProcessorInterface.h"
 #include "Core/HW/SI/SI_DeviceGBA.h"
 #include "Core/HW/SystemTimers.h"
+#include "Core/HW/VideoInterface.h"
 #include "Core/Movie.h"
 #include "Core/NetPlayProto.h"
 
@@ -52,7 +52,6 @@ enum
   SI_COM_CSR = 0x34,
   SI_STATUS_REG = 0x38,
   SI_EXI_CLOCK_COUNT = 0x3C,
-  SI_IO_BUFFER = 0x80,
 };
 
 // SI Channel Output
@@ -353,21 +352,24 @@ void Init()
     s_channel[i].in_lo.hex = 0;
     s_channel[i].has_recent_device_change = false;
 
-    if (Movie::IsMovieActive())
-    {
-      s_desired_device_types[i] = SIDEVICE_NONE;
-
-      if (Movie::IsUsingPad(i))
-      {
-        SIDevices current = SConfig::GetInstance().m_SIDevice[i];
-        // GC pad-compatible devices can be used for both playing and recording
-        if (Movie::IsUsingBongo(i))
-          s_desired_device_types[i] = SIDEVICE_GC_TARUKONGA;
-        else if (SIDevice_IsGCController(current))
-          s_desired_device_types[i] = current;
-        else
-          s_desired_device_types[i] = SIDEVICE_GC_CONTROLLER;
-      }
+	//Dragonbane: Added GBA for TASing
+	if (Movie::IsMovieActive())
+	{
+		if (Movie::IsUsingPad(i))
+		{
+			if (Movie::IsUsingBongo(i))
+				AddDevice(SIDEVICE_GC_TARUKONGA, i);
+			else
+				AddDevice(SIDEVICE_GC_CONTROLLER, i);
+		}
+		else if (Movie::IsUsingGBA(i))
+		{
+			AddDevice(SIDEVICE_GC_GBA, i);
+		}
+		else
+		{
+			AddDevice(SIDEVICE_NONE, i);
+		}
     }
     else if (!NetPlay::IsNetPlayRunning())
     {
@@ -405,34 +407,12 @@ void Shutdown()
 void RegisterMMIO(MMIO::Mapping* mmio, u32 base)
 {
   // Register SI buffer direct accesses.
-  const u32 io_buffer_base = base | SI_IO_BUFFER;
   for (size_t i = 0; i < s_si_buffer.size(); i += sizeof(u32))
   {
-    const u32 address = base | static_cast<u32>(io_buffer_base + i);
+    const u32 address = base | static_cast<u32>(s_si_buffer.size() + i);
 
-    mmio->Register(address, MMIO::ComplexRead<u32>([i](u32) {
-                     u32 val;
-                     std::memcpy(&val, &s_si_buffer[i], sizeof(val));
-                     return Common::swap32(val);
-                   }),
-                   MMIO::ComplexWrite<u32>([i](u32, u32 val) {
-                     val = Common::swap32(val);
-                     std::memcpy(&s_si_buffer[i], &val, sizeof(val));
-                   }));
-  }
-  for (size_t i = 0; i < s_si_buffer.size(); i += sizeof(u16))
-  {
-    const u32 address = base | static_cast<u32>(io_buffer_base + i);
-
-    mmio->Register(address, MMIO::ComplexRead<u16>([i](u32) {
-                     u16 val;
-                     std::memcpy(&val, &s_si_buffer[i], sizeof(val));
-                     return Common::swap16(val);
-                   }),
-                   MMIO::ComplexWrite<u16>([i](u32, u16 val) {
-                     val = Common::swap16(val);
-                     std::memcpy(&s_si_buffer[i], &val, sizeof(val));
-                   }));
+    mmio->Register(address, MMIO::DirectRead<u32>((u32*)&s_si_buffer[i]),
+                   MMIO::DirectWrite<u32>((u32*)&s_si_buffer[i]));
   }
 
   // In and out for the 4 SI channels.
@@ -662,4 +642,4 @@ u32 GetPollXLines()
   return s_poll.X;
 }
 
-}  // end of namespace SerialInterface
+} // end of namespace SerialInterface

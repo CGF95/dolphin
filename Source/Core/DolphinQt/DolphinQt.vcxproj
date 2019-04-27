@@ -45,6 +45,7 @@
     </Link>
     <ClCompile>
       <AdditionalIncludeDirectories>$(ProjectDir)VideoInterface;$(ProjectDir)GameList;$(ProjectDir)Debugger;$(ProjectDir)Settings;$(ProjectDir)Config;$(ProjectDir)Config\Mapping;$(ProjectDir)Config\Graphics;$(ProjectDir)NetPlay;$(ProjectDir)QtUtils;$(ProjectDir)TAS;$(ProjectDir)FIFO;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</TreatWarningAsError>
     </ClCompile>
     <Manifest>
       <AdditionalManifestFiles>DolphinQt.manifest;%(AdditionalManifestFiles)</AdditionalManifestFiles>
@@ -114,6 +115,7 @@
     <QtMoc Include="FIFO\FIFOAnalyzer.h" />
     <QtMoc Include="FIFO\FIFOPlayerWindow.h" />
     <QtMoc Include="TAS\GCTASInputWindow.h" />
+    <QtMoc Include="TAS\TunerInput.h" />
     <QtMoc Include="TAS\WiiTASInputWindow.h" />
     <QtMoc Include="TAS\TASCheckBox.h" />
     <QtMoc Include="TAS\TASInputWindow.h" />
@@ -278,6 +280,7 @@
     <ClCompile Include="$(QtMocOutPrefix)WiimoteEmuGeneral.cpp" />
     <ClCompile Include="$(QtMocOutPrefix)WiimoteEmuMotionControl.cpp" />
     <ClCompile Include="$(QtMocOutPrefix)WindowActivationEventFilter.cpp" />
+    <ClCompile Include="..\..\..\Build\x64\Release\Dolphin\moc_TunerInput.cpp" />
     <ClCompile Include="AboutDialog.cpp" />
     <ClCompile Include="CheatsManager.cpp" />
     <ClCompile Include="Config\CheatCodeEditor.cpp" />
@@ -344,6 +347,7 @@
     <ClCompile Include="QtUtils\WinIconHelper.cpp" />
     <ClCompile Include="ResourcePackManager.cpp" />
     <ClCompile Include="TAS\GCTASInputWindow.cpp" />
+    <ClCompile Include="TAS\TunerInput.cpp" />
     <ClCompile Include="TAS\WiiTASInputWindow.cpp" />
     <ClCompile Include="TAS\TASCheckBox.cpp" />
     <ClCompile Include="TAS\TASInputWindow.cpp" />

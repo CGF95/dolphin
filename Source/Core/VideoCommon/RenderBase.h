@@ -258,7 +258,8 @@ protected:
     CONFIG_CHANGE_BIT_BBOX = (1 << 7)
   };
 
-  std::tuple<int, int> CalculateTargetScale(int x, int y) const;
+  std::tuple<int, int>
+  CalculateTargetScale(int x, int y) const;
   bool CalculateTargetSize();
 
   void CheckForConfigChanges();

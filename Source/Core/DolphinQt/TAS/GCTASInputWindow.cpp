@@ -13,9 +13,10 @@
 #include <QVBoxLayout>
 
 #include "Common/CommonTypes.h"
-
 #include "DolphinQt/TAS/TASCheckBox.h"
-
+#include "Core/Movie.h"
+#include "Core/HW/Memmap.h"
+#include "Core/Core.h"
 #include "InputCommon/GCPadStatus.h"
 
 GCTASInputWindow::GCTASInputWindow(QWidget* parent, int num) : TASInputWindow(parent)
@@ -81,7 +82,6 @@ GCTASInputWindow::GCTASInputWindow(QWidget* parent, int num) : TASInputWindow(pa
   layout->addWidget(m_triggers_box);
   layout->addWidget(m_buttons_box);
   layout->addWidget(m_use_controller);
-
   setLayout(layout);
 }
 

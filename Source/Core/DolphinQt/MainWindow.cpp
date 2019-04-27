@@ -16,6 +16,7 @@
 #include <QStackedWidget>
 #include <QVBoxLayout>
 #include <QWindow>
+#include <QWidget>
 
 #include <future>
 #include <optional>
@@ -93,6 +94,7 @@
 #include "DolphinQt/SearchBar.h"
 #include "DolphinQt/Settings.h"
 #include "DolphinQt/TAS/GCTASInputWindow.h"
+#include "DolphinQt/TAS/TunerInput.h"
 #include "DolphinQt/TAS/WiiTASInputWindow.h"
 #include "DolphinQt/ToolBar.h"
 #include "DolphinQt/WiiUpdate.h"
@@ -372,6 +374,8 @@ void MainWindow::CreateComponents()
     m_wii_tas_input_windows[controller_id]->GetValues(rpt, ext, key);
   });
 
+  m_tuner_window = new TunerInput(this);
+
   m_jit_widget = new JITWidget(this);
   m_log_widget = new LogWidget(this);
   m_log_config_widget = new LogConfigWidget(this);
@@ -464,6 +468,7 @@ void MainWindow::ConnectMenuBar()
   connect(m_menu_bar, &MenuBar::StopRecording, this, &MainWindow::OnStopRecording);
   connect(m_menu_bar, &MenuBar::ExportRecording, this, &MainWindow::OnExportRecording);
   connect(m_menu_bar, &MenuBar::ShowTASInput, this, &MainWindow::ShowTASInput);
+  connect(m_menu_bar, &MenuBar::ShowTunerInput, this, &MainWindow::ShowTunerInput);
 
   // View
   connect(m_menu_bar, &MenuBar::ShowList, m_game_list, &GameList::SetListView);
@@ -1624,6 +1629,11 @@ void MainWindow::OnRequestGolfControl()
   auto client = Settings::Instance().GetNetPlayClient();
   if (client)
     client->RequestGolfControl();
+}
+
+void MainWindow::ShowTunerInput()
+{
+  m_tuner_window->show();
 }
 
 void MainWindow::ShowTASInput()

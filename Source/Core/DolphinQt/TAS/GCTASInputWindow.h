@@ -18,6 +18,8 @@ public:
   explicit GCTASInputWindow(QWidget* parent, int num);
   void GetValues(GCPadStatus* pad);
 
+  void ExecuteHelpers(GCPadStatus* pad);
+
 private:
   TASCheckBox* m_a_button;
   TASCheckBox* m_b_button;

@@ -1,11 +1,10 @@
-# Dolphin - A GameCube and Wii Emulator
+# Custom Dolphin Build by Dragonbane (Zelda Edition)
 
-[Homepage](https://dolphin-emu.org/) | [Project Site](https://github.com/dolphin-emu/dolphin) | [Forums](https://forums.dolphin-emu.org/) | [Wiki](https://wiki.dolphin-emu.org/) | [Issue Tracker](https://bugs.dolphin-emu.org/projects/emulator/issues) | [Coding Style](https://github.com/dolphin-emu/dolphin/blob/master/Contributing.md) | [Transifex Page](https://www.transifex.com/projects/p/dolphin-emu/)
+Based on Dragonbane's build of Dolphin. See Dolphin Project:
 
-Dolphin is an emulator for running GameCube and Wii games on Windows,
-Linux, macOS, and recent Android devices. It's licensed under the terms
-of the GNU General Public License, version 2 or later (GPLv2+).
+[Homepage](https://dolphin-emu.org/) | [Project Site](https://github.com/dolphin-emu/dolphin) | [Forums](https://forums.dolphin-emu.org/) | [Wiki](https://wiki.dolphin-emu.org/) | [Coding Style](https://github.com/dolphin-emu/dolphin/blob/master/Contributing.md) | [Transifex Page](https://www.transifex.com/projects/p/dolphin-emu/)
 
+<<<<<<< HEAD
 Please read the [FAQ](https://dolphin-emu.org/docs/faq/) before using Dolphin.
 
 ## System Requirements
@@ -103,9 +102,14 @@ Or useful for having multiple distinct Dolphin setups for testing/development/TA
 
 These instructions assume familiarity with Android development. If you do not have an
 Android dev environment set up, see [AndroidSetup.md](AndroidSetup.md).
+=======
+>>>>>>> Qt-stuff
 
-If using Android Studio, import the Gradle project located in `./Source/Android`.
+Dolphin is an emulator for running GameCube, Wii, and Triforce games on
+Windows, Linux, OS X, and recent Android devices. It's licensed under
+the terms of the GNU General Public License, version 2 (GPLv2).
 
+<<<<<<< HEAD
 Android apps are compiled using a build system called Gradle. Dolphin's native component,
 however, is compiled using CMake. The Gradle script will attempt to run a CMake build
 automatically while building the Java code.
@@ -217,7 +221,8 @@ List of user folders:
 * `Wii`: Wii NAND contents
 
 ## Custom Textures
+=======
+Please read the [FAQ](https://dolphin-emu.org/docs/faq/) before using Dolphin.
+>>>>>>> Qt-stuff
 
-Custom textures have to be placed in the user directory under
-`Load/Textures/[GameID]/`. You can find the Game ID by right-clicking a game
-in the ISO list and selecting "ISO Properties".
+This software comes as is, so bugs are expected, especially with my own hacky version of Dolphin.

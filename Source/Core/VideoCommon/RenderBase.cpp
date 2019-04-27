@@ -42,6 +42,7 @@
 #include "Core/ConfigManager.h"
 #include "Core/Core.h"
 #include "Core/FifoPlayer/FifoRecorder.h"
+#include "Core/HW/Memmap.h"  //CGF
 #include "Core/HW/SystemTimers.h"
 #include "Core/HW/VideoInterface.h"
 #include "Core/Host.h"
@@ -75,6 +76,7 @@
 #include "VideoCommon/VideoBackendBase.h"
 #include "VideoCommon/VideoConfig.h"
 #include "VideoCommon/XFMemory.h"
+//#include "DolphinQt/TAS/GCTASInputWindow.h"
 
 std::unique_ptr<Renderer> g_renderer;
 
@@ -524,6 +526,34 @@ void Renderer::DrawDebugText()
         ImGui::TextUnformatted(Movie::GetInputDisplay().c_str());
       if (SConfig::GetInstance().m_ShowRTC)
         ImGui::TextUnformatted(Movie::GetRTCDisplay().c_str());
+    }
+    std::string gameID = SConfig::GetInstance().GetGameID();
+    if (!gameID.compare("GZLJ01"))
+    {
+      int GetTunerStatus = Movie::tunerStatus;
+      switch(GetTunerStatus)
+      {
+      case 0:
+        ImGui::Text("Tuner Status: Disabled");
+        break;
+      case 1:
+        ImGui::Text("Tuner Status: Standby");
+        break;
+      case 2:
+        ImGui::Text("Tuner Status: Ready");
+        break;
+      case 3:
+        ImGui::Text("Tuner Status: Connecting");
+        break;
+      case 4:
+        ImGui::Text("Tuner Status: Calling");
+        break;
+      case 5:
+        ImGui::Text("Tuner Status: Connected");
+        break;
+      default:
+        ImGui::Text("Tuner Status: N/A");
+      }
     }
     ImGui::End();
   }
